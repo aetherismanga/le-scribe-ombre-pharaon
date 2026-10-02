@@ -437,6 +437,9 @@ body.immersive-fallback #fsPrevEdge{display:flex}
   #fsPrevEdge{display:none!important}
 }
 
+
+/* Lecture vocale désactivée */
+#audioBtn,#audioDrawer,#audioMini{display:none!important}
 </style>
 </head>
 <body class="theme-ivory">
@@ -446,7 +449,6 @@ body.immersive-fallback #fsPrevEdge{display:flex}
     <div class="actions">
       <button class="icon-btn" id="chaptersBtn" aria-label="Chapitres">☰ Chapitres</button>
       <button class="icon-btn" id="lexiconBtn" aria-label="Lexique">Lexique</button>
-      <button class="icon-btn" id="audioBtn" aria-label="Lecture vocale" title="Lecture vocale">🔊 <span class="audio-label">Écouter</span></button>
       <button class="icon-btn" id="installBtn" aria-label="Installer l’application" title="Installer l’application">⬇ <span class="install-label">Installer</span></button>
       <button class="icon-btn" id="fullscreenBtn" aria-label="Plein écran" title="Plein écran">⛶ <span class="fs-label">Plein écran</span></button>
       <button class="icon-btn" id="settingsBtn" aria-label="Réglages">Aa</button>
@@ -474,14 +476,7 @@ body.immersive-fallback #fsPrevEdge{display:flex}
 </div>
 
 <button type="button" id="fsExitBtn" aria-label="Quitter le plein écran" title="Quitter le plein écran">×</button>
-<div id="fsPrevEdge" role="button" aria-label="Page précédente" title="Page précédente"></div>
-<div id="audioMini" aria-label="Contrôles de lecture vocale">
-  <span class="audio-mini-label" id="audioMiniLabel">Lecture vocale</span>
-  <button type="button" id="audioMiniPause" aria-label="Pause ou reprendre">⏸</button>
-  <button type="button" id="audioMiniStop" aria-label="Arrêter">■</button>
-</div>
-
-<div class="drawer-backdrop" id="backdrop"></div>
+<div id="fsPrevEdge" role="button" aria-label="Page précédente" title="Page précédente"></div><div class="drawer-backdrop" id="backdrop"></div>
 
 <aside class="drawer" id="chaptersDrawer" aria-label="Chapitres">
   <div class="drawer-head"><h2>Chapitres</h2><button class="close-btn" data-close>×</button></div>
@@ -494,29 +489,7 @@ body.immersive-fallback #fsPrevEdge{display:flex}
     <input class="lex-search" id="lexSearch" type="search" placeholder="Rechercher un terme…" autocomplete="off">
     <div id="lexList"></div>
   </div>
-</aside>
-
-<aside class="drawer" id="audioDrawer" aria-label="Lecture vocale">
-  <div class="drawer-head"><h2>Lecture vocale</h2><button class="close-btn" data-close>×</button></div>
-  <div class="drawer-body audio-controls">
-    <div class="audio-main">
-      <button type="button" id="audioPlay" class="primary">▶ Lire depuis ici</button>
-      <button type="button" id="audioStop">■ Arrêter</button>
-    </div>
-    <div class="audio-status" id="audioStatus">Prêt à lire le roman à voix haute.</div>
-    <div class="audio-setting">
-      <label for="voiceSelect">Voix française</label>
-      <select id="voiceSelect"><option value="">Voix française automatique</option></select>
-    </div>
-    <div class="audio-setting">
-      <label for="speechRate">Vitesse : <span id="speechRateValue">0,92</span>×</label>
-      <input id="speechRate" type="range" min="0.75" max="1.20" step="0.05" value="0.92">
-    </div>
-    <p class="audio-note">La voix dépend de celles installées sur votre téléphone ou votre ordinateur. L’application privilégie automatiquement une voix française et une vitesse douce.</p>
-  </div>
-</aside>
-
-<aside class="drawer" id="settingsDrawer" aria-label="Réglages de lecture">
+</aside><aside class="drawer" id="settingsDrawer" aria-label="Réglages de lecture">
   <div class="drawer-head"><h2>Confort de lecture</h2><button class="close-btn" data-close>×</button></div>
   <div class="drawer-body settings-grid">
     <div class="setting">
@@ -777,7 +750,7 @@ body.immersive-fallback #fsPrevEdge{display:flex}
   function updateResumeBanner(){const b=$('resumeBanner');if(!savedAnchor){b.classList.remove('show');return;}const p=pageForAnchor(savedAnchor);if(p>0&&p<=textPages){$('resumeText').textContent='Reprendre à la page '+(p+1)+' sur '+totalPages+' ?';b.classList.add('show');}else b.classList.remove('show');}
 
   prevBtn.addEventListener('click',prev);nextBtn.addEventListener('click',next);
-  $('chaptersBtn').addEventListener('click',()=>openDrawer('chaptersDrawer'));$('lexiconBtn').addEventListener('click',()=>openDrawer('lexiconDrawer'));$('audioBtn').addEventListener('click',()=>openDrawer('audioDrawer'));$('settingsBtn').addEventListener('click',()=>openDrawer('settingsDrawer'));
+  $('chaptersBtn').addEventListener('click',()=>openDrawer('chaptersDrawer'));$('lexiconBtn').addEventListener('click',()=>openDrawer('lexiconDrawer'));$('settingsBtn').addEventListener('click',()=>openDrawer('settingsDrawer'));
   $('fullscreenBtn').addEventListener('click',toggleFullscreen);$('fsExitBtn').addEventListener('click',leaveFullscreen);
   $('fsPrevEdge').addEventListener('click',e=>{e.preventDefault();e.stopPropagation();prev();});
   document.addEventListener('fullscreenchange',onFullscreenChange);document.addEventListener('webkitfullscreenchange',onFullscreenChange);
@@ -803,8 +776,7 @@ body.immersive-fallback #fsPrevEdge{display:flex}
   $('voiceSelect').addEventListener('change',e=>{selectedVoiceURI=e.target.value||'';localStorage.setItem(STORAGE.voice,selectedVoiceURI);restartNarrationCurrent();});
   $('speechRate').value=String(speechRate);$('speechRateValue').textContent=speechRate.toFixed(2).replace('.',',');
   $('speechRate').addEventListener('input',e=>{speechRate=Math.max(.75,Math.min(1.2,Number(e.target.value)||.92));$('speechRateValue').textContent=speechRate.toFixed(2).replace('.',',');localStorage.setItem(STORAGE.speechRate,String(speechRate));restartNarrationCurrent();});
-  if(speechSupported()){loadSpeechVoices();window.speechSynthesis.onvoiceschanged=loadSpeechVoices;setTimeout(loadSpeechVoices,250);}
-  updateAudioUI();
+  
   const handleViewportChange=()=>{clearTimeout(resizeTimer);const a=captureVisibleAnchor()||savedAnchor;syncViewportMetrics();resizeTimer=setTimeout(()=>{if(current>0&&current<totalPages-1){pageEl.className='page text-flow-page';pageEl.innerHTML=buildFlow();}recalcLayout(a);},160);};
   window.addEventListener('resize',handleViewportChange,{passive:true});
   if(window.visualViewport){window.visualViewport.addEventListener('resize',handleViewportChange,{passive:true});window.visualViewport.addEventListener('scroll',handleViewportChange,{passive:true});}
