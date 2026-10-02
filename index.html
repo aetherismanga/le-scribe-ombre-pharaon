@@ -741,6 +741,15 @@ body.immersive-fallback #fsPrevEdge{display:flex}
     return filteredVoices()[0]||speechVoices[0]||null;
   }
   async function testVoice(){try{if(!(await hdStored())){await installHdVoices();return;}if(hdAudio){hdAudio.pause();hdAudio=null;}hdAudio=await makeHdAudio('Bienvenue dans Le Scribe et l’Ombre de Pharaon. La nuit tombe sur les rives du Nil.');await hdAudio.play();}catch(e){$('hdVoiceStatus').textContent=friendlyHdError(e);}}
+  const HD_VOICE_ID='fr_FR-upmc-medium';
+  let hdTts=null,hdNarrator=localStorage.getItem('scribe-hd-narrator')||'female',hdAudio=null;
+  const hdSpeakerId=()=>hdNarrator==='male'?1:0;
+  async function loadHdTts(){if(hdTts)return hdTts;$('hdVoiceStatus').textContent='Chargement du moteur vocal…';hdTts=await import('https://cdn.jsdelivr.net/npm/@realtimex/piper-tts-web@1.1.1/+esm');return hdTts;}
+  function friendlyHdError(e){const m=String(e&&e.message||e||'Erreur inconnue');return 'Erreur voix : '+m.slice(0,180);}
+  async function hdStored(){const t=await loadHdTts(),s=await t.stored();return Array.isArray(s)&&s.includes(HD_VOICE_ID);}
+  async function refreshHdVoiceState(){try{const ok=await hdStored();$('hdVoiceInstall').style.display=ok?'none':'block';$('hdVoiceStatus').textContent=ok?'✓ Pack vocal HD installé.':'Pack vocal HD à télécharger (~77 Mo).';$('audioPlay').disabled=!ok;$('voiceTest').disabled=!ok;return ok;}catch(e){$('hdVoiceStatus').textContent=friendlyHdError(e);return false;}}
+  async function installHdVoices(){const b=$('hdVoiceInstall');b.disabled=true;try{const t=await loadHdTts();if(!(await hdStored()))await t.download(HD_VOICE_ID,p=>{const pct=p&&p.total?Math.round((p.loaded||0)*100/p.total):0;$('hdVoiceStatus').textContent='Téléchargement du pack vocal'+(pct?' — '+pct+' %':'…');});await refreshHdVoiceState();}catch(e){$('hdVoiceStatus').textContent=friendlyHdError(e);}finally{b.disabled=false;}}
+  async function makeHdAudio(text){const t=await loadHdTts();const session=new t.TtsSession({voiceId:HD_VOICE_ID,allowLocalModels:true,fallbackStrategy:'auto'});const wav=await session.predict(text,{speakerId:hdSpeakerId()});const u=URL.createObjectURL(wav),a=new Audio(u);a.playbackRate=speechRate;a.addEventListener('ended',()=>URL.revokeObjectURL(u),{once:true});return a;}
   function updateAudioUI(){
     const play=$('audioPlay'),mini=$('audioMini'),miniPause=$('audioMiniPause');
     
