@@ -1,5 +1,9 @@
-const CACHE_NAME = 'le-scribe-v2';
-const APP_SHELL = ['./', './index.html', './manifest.webmanifest', './icon.svg', './icon-192.png', './icon-512.png'];
+const CACHE_NAME = 'le-scribe-v3-images';
+const APP_SHELL = ['./', './index.html', './manifest.webmanifest', './icon.svg', './icon-192.png', './icon-512.png',
+  './images/Le Scribe et l’Ombre du Pharaon.png',
+  './images/Prologue  Le Signe dans la Cire.png',
+  './images/Chapitre I  Celui qui comptait les grains.png',
+  './images/Chapitre II  La Chambre retournée.png'];
 
 self.addEventListener('install', event => {
   event.waitUntil(
