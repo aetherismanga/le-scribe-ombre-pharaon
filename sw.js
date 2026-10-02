@@ -1,27 +1,24 @@
-const CACHE_NAME = 'le-scribe-v5-force-update';
-const APP_SHELL = [
+const CACHE_NAME = 'le-scribe-v6-fast-start';
+const CORE = [
   './',
   './index.html',
   './manifest.webmanifest',
   './icon.svg',
   './icon-192.png',
   './icon-512.png',
-  './images/Le Scribe et l’Ombre du Pharaon.png',
-  './images/Prologue  Le Signe dans la Cire.png',
-  './images/Chapitre I  Celui qui comptait les grains.png',
-  './images/Chapitre II  La Chambre retournée.png'
+  './images/Le Scribe et l’Ombre du Pharaon.png'
 ];
 
 self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache =>
-      Promise.all(APP_SHELL.map(url =>
-        fetch(url, { cache: 'reload' }).then(response => {
-          if (!response.ok) throw new Error('Precache failed: ' + url);
-          return cache.put(url, response);
-        })
-      ))
-    )
+    caches.open(CACHE_NAME).then(async cache => {
+      for (const url of CORE) {
+        try {
+          const response = await fetch(url, { cache: 'reload' });
+          if (response.ok) await cache.put(url, response);
+        } catch (_) {}
+      }
+    })
   );
   self.skipWaiting();
 });
@@ -45,23 +42,35 @@ self.addEventListener('fetch', event => {
   if (url.origin !== self.location.origin) return;
 
   const isNavigation = req.mode === 'navigate';
-  const isAppAsset =
-    url.pathname.endsWith('/index.html') ||
-    url.pathname.endsWith('/manifest.webmanifest') ||
-    url.pathname.endsWith('.png') ||
-    url.pathname.endsWith('.svg');
+  const isImage = /\.(png|jpg|jpeg|webp|svg)$/i.test(url.pathname);
 
-  if (isNavigation || isAppAsset) {
+  if (isNavigation) {
     event.respondWith(
       fetch(req, { cache: 'no-store' })
         .then(response => {
           if (response && response.ok) {
             const copy = response.clone();
-            caches.open(CACHE_NAME).then(cache => cache.put(req, copy));
+            event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.put('./index.html', copy)));
           }
           return response;
         })
-        .catch(() => caches.match(req).then(r => r || (isNavigation ? caches.match('./index.html') : undefined)))
+        .catch(() => caches.match('./index.html'))
+    );
+    return;
+  }
+
+  if (isImage) {
+    event.respondWith(
+      caches.match(req).then(cached => {
+        if (cached) return cached;
+        return fetch(req).then(response => {
+          if (response && response.ok) {
+            const copy = response.clone();
+            event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.put(req, copy)));
+          }
+          return response;
+        });
+      })
     );
     return;
   }
