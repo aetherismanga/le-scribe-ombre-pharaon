@@ -500,6 +500,48 @@ body.immersive-fallback #fsPrevEdge{display:flex}
 .notify-consent{display:flex;gap:9px;align-items:flex-start;font-size:.88rem;margin:13px 0}.notify-save{width:100%;border:1px solid #dfad4d;border-radius:14px;padding:13px;background:linear-gradient(180deg,#d0932c,#9d6118);color:#fff;font-weight:800}
 @media(max-width:720px){.topbar{min-height:64px;padding:6px 8px}.brand{display:none}.actions{width:100%;justify-content:space-between;gap:5px}.icon-btn{flex:1;min-width:0;min-height:52px;padding:4px!important;font-size:10px!important}.ui-icon{width:23px;height:23px}#installBtn{display:none!important}.stage{padding-top:8px}}
 @media(max-width:390px){.icon-btn{font-size:9px!important}.icon-btn .audio-label,.icon-btn .fs-label{display:none!important}}
+
+/* V7 — interface égyptienne validée + sommaire illustré */
+.topbar{background:#07111d!important;border-bottom:2px solid #b77a22!important;box-shadow:0 4px 16px rgba(0,0,0,.42);padding:7px 10px!important}
+.actions{gap:8px!important}
+.icon-btn{position:relative!important;overflow:hidden!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:2px!important;min-height:72px!important;padding:7px 13px!important;border:2px solid #b77a22!important;border-radius:18px!important;background:linear-gradient(145deg,#102132,#06101b)!important;color:#f7dfac!important;box-shadow:inset 0 0 0 2px rgba(240,180,69,.12),0 0 10px rgba(207,139,35,.2)!important;text-shadow:0 1px 2px #000!important}
+.icon-btn:before,.icon-btn:after{content:"";position:absolute;pointer-events:none;opacity:.65}
+.icon-btn:before{inset:4px;border:1px solid rgba(218,154,49,.45);border-radius:13px}
+.icon-btn:after{left:9px;right:9px;top:8px;height:1px;background:linear-gradient(90deg,transparent,#d9a34a,transparent)}
+.icon-btn .ui-icon{width:31px!important;height:31px!important;color:#f2bd55!important;filter:drop-shadow(0 0 4px rgba(255,190,73,.35))}
+.icon-btn .ui-aa{font-size:31px!important;line-height:1!important;color:#f2bd55!important}
+.icon-btn span:not(.ui-aa){font-size:13px!important;font-weight:700!important}
+.icon-btn:hover,.icon-btn:active{background:linear-gradient(145deg,#55300e,#160d08)!important;box-shadow:inset 0 0 16px rgba(255,168,33,.28),0 0 12px rgba(255,169,33,.45)!important}
+.nav button{position:relative;border:2px solid #b67a26!important;border-radius:22px!important;background:linear-gradient(180deg,#fff8e9,#ead7b1)!important;color:#3b2817!important;font-weight:700!important;box-shadow:inset 0 0 0 2px rgba(255,255,255,.48),0 3px 9px rgba(79,49,13,.18)!important}
+.nav .next{background:linear-gradient(180deg,#e3a52e,#b66e12)!important;color:#fff8e8!important}
+.progress{height:9px!important;border:2px solid #a66a18!important;background:#111821!important;box-shadow:inset 0 0 3px #000!important}
+.progress>span{background:linear-gradient(90deg,#f5c14f,#c67b16)!important}
+#chaptersDrawer{width:min(620px,94vw)!important;background:#f8eed5!important}
+#chaptersDrawer .drawer-head{background:linear-gradient(180deg,#fff9e8,#f0dfb8)!important;border-bottom:1px solid #c99847!important;padding:22px 28px!important}
+#chaptersDrawer .drawer-head h2{font-size:2rem!important;color:#251b12!important}
+#chaptersDrawer .drawer-body{padding:18px 20px 28px!important}
+.chapter-list{gap:12px!important}
+.chapter-link{position:relative!important;display:grid!important;grid-template-columns:92px 1fr 42px!important;grid-template-rows:auto auto!important;column-gap:14px!important;align-items:center!important;min-height:104px!important;padding:9px 12px!important;border:2px solid #c69a55!important;border-radius:16px!important;background:linear-gradient(135deg,#fffaf0,#f1dfba)!important;color:#352719!important;overflow:hidden!important;box-shadow:0 3px 8px rgba(77,48,17,.12)!important}
+.chapter-link .chapter-thumb{grid-column:1;grid-row:1/3;width:92px;height:82px;object-fit:cover;border-radius:10px;border:1px solid #a66c21;box-shadow:0 2px 6px rgba(0,0,0,.22)}
+.chapter-link strong{grid-column:2;grid-row:1;align-self:end;font-size:1rem;line-height:1.15;text-transform:uppercase}
+.chapter-link .chapter-name{grid-column:2;grid-row:2;align-self:start;font-size:1.05rem;line-height:1.18;text-transform:uppercase}
+.chapter-link .chapter-status{grid-column:3;grid-row:1/3;display:flex!important;align-items:center;justify-content:center;width:38px;height:38px;border-radius:50%;border:2px solid #b48a45;color:transparent;background:transparent}
+.chapter-link.completed{background:linear-gradient(135deg,#fff8e7,#e8d19d)!important}
+.chapter-link.completed .chapter-status{color:#fff!important;background:linear-gradient(180deg,#e7ad37,#b66d13)!important;border-color:#f1c66d!important}
+.chapter-link.active{outline:none!important;border-color:#f0b73f!important;background:linear-gradient(135deg,#6b3c12,#bd7417)!important;color:#fff8e7!important;box-shadow:0 0 14px rgba(219,145,31,.5)!important}
+.chapter-link.active .chapter-status{color:#fff!important;background:#efb642!important}
+@media(max-width:720px){
+ .topbar{min-height:74px!important;padding:5px 6px!important}
+ .actions{gap:5px!important}
+ .icon-btn{min-height:64px!important;padding:5px 4px!important;border-radius:15px!important}
+ .icon-btn .ui-icon{width:27px!important;height:27px!important}.icon-btn .ui-aa{font-size:28px!important}
+ .icon-btn span:not(.ui-aa){font-size:11px!important}
+ #chaptersDrawer{width:94vw!important}
+ .chapter-link{grid-template-columns:76px 1fr 38px!important;min-height:92px!important;padding:8px!important;column-gap:10px!important}
+ .chapter-link .chapter-thumb{width:76px;height:72px!important}
+ .chapter-link strong{font-size:.9rem!important}.chapter-link .chapter-name{font-size:.95rem!important}
+}
+
 </style>
 </head>
 <body class="theme-ivory">
@@ -780,7 +822,15 @@ body.immersive-fallback #fsPrevEdge{display:flex}
   function openDrawer(id){closeDrawers();$(id).classList.add('open');if(id==='settingsDrawer'){document.body.classList.add('settings-open');return;}$('backdrop').classList.add('open');}
   function closeDrawers(){document.querySelectorAll('.drawer').forEach(d=>d.classList.remove('open'));$('backdrop').classList.remove('open');document.body.classList.remove('settings-open');}
   function buildChapters(){
-    const list=$('chapterList');list.innerHTML='';RAW.sections.forEach((s,i)=>{const b=document.createElement('button');b.type='button';b.className='chapter-link'+(completedSections.has(i)?' completed':'');b.dataset.section=i;b.innerHTML='<strong>'+esc(s.label)+'</strong><br><span>'+esc(s.title)+'</span><span class="chapter-status" aria-hidden="true">✓</span>';b.setAttribute('aria-label',s.label+' — '+s.title+(completedSections.has(i)?' — terminé':''));b.addEventListener('click',()=>{if(!layoutReady){showToast('Mise en page en cours…');return;}goTo(chapterPageIndices[i]||1,'next');closeDrawers();});list.appendChild(b);});highlightChapter();
+    const list=$('chapterList');list.innerHTML='';
+    RAW.sections.forEach((s,i)=>{
+      const b=document.createElement('button');b.type='button';b.className='chapter-link'+(completedSections.has(i)?' completed':'');b.dataset.section=i;
+      const img=CHAPTER_IMAGES[i]||FRONT;
+      b.innerHTML='<img class="chapter-thumb" src="'+esc(img)+'" alt="" loading="lazy"><strong>'+esc(s.label)+'</strong><span class="chapter-name">'+esc(s.title)+'</span><span class="chapter-status" aria-hidden="true">✓</span>';
+      b.setAttribute('aria-label',s.label+' — '+s.title+(completedSections.has(i)?' — terminé':''));
+      b.addEventListener('click',()=>{if(!layoutReady){showToast('Mise en page en cours…');return;}goTo(chapterPageIndices[i]||1,'next');closeDrawers();});
+      list.appendChild(b);
+    });highlightChapter();
   }
   function highlightChapter(){const sec=currentSection();document.querySelectorAll('.chapter-link').forEach(b=>b.classList.toggle('active',sec>=0&&Number(b.dataset.section)===sec));}
   function renderLexicon(query=''){
@@ -959,7 +1009,7 @@ body.immersive-fallback #fsPrevEdge{display:flex}
       swReloaded=true;
       location.reload();
     });
-    navigator.serviceWorker.register('sw.js?v=20261003-ui2',{updateViaCache:'none'}).then(reg=>{
+    navigator.serviceWorker.register('sw.js?v=20261003-ui3',{updateViaCache:'none'}).then(reg=>{
       reg.update().catch(()=>{});
       if(reg.waiting)reg.waiting.postMessage({type:'SKIP_WAITING'});
       reg.addEventListener('updatefound',()=>{
