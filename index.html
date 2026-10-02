@@ -566,7 +566,8 @@ body.immersive-fallback #fsPrevEdge{display:flex}
     <div class="book-shell">
       <article class="page" id="page" tabindex="0" aria-live="polite"></article>
     </div>
-    <nav class="nav" aria-label="Navigation de lecture">
+    <div id="pageJumpModal" class="notify-modal" aria-hidden="true"><div class="notify-card" style="max-width:360px"><div class="notify-head"><h2>Aller à la page</h2><button type="button" id="pageJumpClose" class="close-btn">×</button></div><div style="padding:18px"><input id="pageJumpRange" type="range" min="1" max="1" value="1" style="width:100%"><div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-top:16px"><label for="pageJumpInput">Page</label><input id="pageJumpInput" type="number" min="1" max="1" value="1" inputmode="numeric" style="width:90px;padding:10px;border:1px solid var(--border);border-radius:9px;font:inherit;text-align:center"><span id="pageJumpTotal"></span></div><button type="button" class="primary" id="pageJumpGo" style="width:100%;margin-top:18px">Aller à cette page</button></div></div></div>
+<nav class="nav" aria-label="Navigation de lecture">
       <button type="button" id="prevBtn">← Précédent</button>
       <span id="pageCounter" aria-live="polite"></span>
       <button type="button" id="nextBtn" class="next">Suivant →</button>
@@ -950,6 +951,13 @@ body.immersive-fallback #fsPrevEdge{display:flex}
   function updateResumeBanner(){const b=$('resumeBanner');if(!savedAnchor){b.classList.remove('show');return;}const p=pageForAnchor(savedAnchor);if(p>0&&p<=textPages){$('resumeText').textContent='Reprendre à la page '+(p+1)+' sur '+totalPages+' ?';b.classList.add('show');}else b.classList.remove('show');}
 
   prevBtn.addEventListener('click',prev);nextBtn.addEventListener('click',next);
+  pageCounter.addEventListener('click',()=>{if(!layoutReady)return;const max=totalPages;const v=Math.max(1,Math.min(max,current+1));const modal=$('pageJumpModal'),range=$('pageJumpRange'),input=$('pageJumpInput');range.max=input.max=String(max);range.value=input.value=String(v);$('pageJumpTotal').textContent='/ '+max;modal.classList.add('open');modal.setAttribute('aria-hidden','false');});
+  $('pageJumpRange').addEventListener('input',e=>$('pageJumpInput').value=e.target.value);
+  $('pageJumpInput').addEventListener('input',e=>{$('pageJumpRange').value=Math.max(1,Math.min(totalPages,Number(e.target.value)||1));});
+  function closePageJump(){$('pageJumpModal').classList.remove('open');$('pageJumpModal').setAttribute('aria-hidden','true');}
+  $('pageJumpClose').addEventListener('click',closePageJump);$('pageJumpModal').addEventListener('click',e=>{if(e.target===$('pageJumpModal'))closePageJump();});
+  $('pageJumpGo').addEventListener('click',()=>{const p=Math.max(1,Math.min(totalPages,Number($('pageJumpInput').value)||1));closePageJump();goTo(p-1,p-1<current?'prev':'next');});
+  
   $('chaptersBtn').addEventListener('click',()=>openDrawer('chaptersDrawer'));$('lexiconBtn').addEventListener('click',()=>openDrawer('lexiconDrawer'));$('audioBtn').addEventListener('click',()=>{openDrawer('audioDrawer');setTimeout(async()=>{const ok=await refreshHdVoiceState();if(!ok)installHdVoices();},80);});$('settingsBtn').addEventListener('click',()=>openDrawer('settingsDrawer'));
   $('notifyClose').addEventListener('click',()=>{$('notifyModal').classList.remove('open');$('notifyModal').setAttribute('aria-hidden','true');});
   $('notifyModal').addEventListener('click',e=>{if(e.target===$('notifyModal'))$('notifyClose').click();});
