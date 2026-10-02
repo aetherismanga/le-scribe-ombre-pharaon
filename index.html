@@ -740,13 +740,7 @@ body.immersive-fallback #fsPrevEdge{display:flex}
     if(selectedVoiceURI){const v=speechVoices.find(x=>x.voiceURI===selectedVoiceURI);if(v)return v;}
     return filteredVoices()[0]||speechVoices[0]||null;
   }
-  function testVoice(){
-    if(!speechSupported())return;
-    window.speechSynthesis.cancel();
-    const u=new SpeechSynthesisUtterance('Bienvenue dans Le Scribe et l’Ombre de Pharaon. La nuit tombe sur les rives du Nil.');
-    const v=chosenVoice();if(v)u.voice=v;u.lang=(v&&v.lang)||'fr-FR';u.rate=speechRate;u.pitch=1;
-    window.speechSynthesis.speak(u);
-  }
+  async function testVoice(){try{if(!(await hdStored())){await installHdVoices();return;}if(hdAudio){hdAudio.pause();hdAudio=null;}hdAudio=await makeHdAudio('Bienvenue dans Le Scribe et l’Ombre de Pharaon. La nuit tombe sur les rives du Nil.');await hdAudio.play();}catch(e){$('hdVoiceStatus').textContent=friendlyHdError(e);}}
   function updateAudioUI(){
     const play=$('audioPlay'),mini=$('audioMini'),miniPause=$('audioMiniPause');
     
@@ -773,7 +767,7 @@ body.immersive-fallback #fsPrevEdge{display:flex}
   }
   async function startNarration(){
     if(narration.active){toggleNarrationPause();return;}
-    const s=await hdStored();if(!s[hdNarrator]){await installHdVoices();return;}
+    const ok=await hdStored();if(!ok){await installHdVoices();return;}
     if(current===totalPages-1||current===0)goTo(1,'next');
     const a=anchorFromCurrent().split('-').map(Number);narration={active:true,paused:false,section:Number.isFinite(a[0])?a[0]:0,paragraph:Number.isFinite(a[1])?a[1]:0};speechGeneration++;setTimeout(speakNarrationParagraph,50);updateAudioUI();
   }
@@ -792,7 +786,7 @@ body.immersive-fallback #fsPrevEdge{display:flex}
   function updateResumeBanner(){const b=$('resumeBanner');if(!savedAnchor){b.classList.remove('show');return;}const p=pageForAnchor(savedAnchor);if(p>0&&p<=textPages){$('resumeText').textContent='Reprendre à la page '+(p+1)+' sur '+totalPages+' ?';b.classList.add('show');}else b.classList.remove('show');}
 
   prevBtn.addEventListener('click',prev);nextBtn.addEventListener('click',next);
-  $('chaptersBtn').addEventListener('click',()=>openDrawer('chaptersDrawer'));$('lexiconBtn').addEventListener('click',()=>openDrawer('lexiconDrawer'));$('audioBtn').addEventListener('click',()=>{openDrawer('audioDrawer');setTimeout(async()=>{await refreshHdVoiceState();const s=await hdStored();if(!s.female||!s.male)installHdVoices();},80);});$('settingsBtn').addEventListener('click',()=>openDrawer('settingsDrawer'));
+  $('chaptersBtn').addEventListener('click',()=>openDrawer('chaptersDrawer'));$('lexiconBtn').addEventListener('click',()=>openDrawer('lexiconDrawer'));$('audioBtn').addEventListener('click',()=>{openDrawer('audioDrawer');setTimeout(async()=>{const ok=await refreshHdVoiceState();if(!ok)installHdVoices();},80);});$('settingsBtn').addEventListener('click',()=>openDrawer('settingsDrawer'));
   $('fullscreenBtn').addEventListener('click',toggleFullscreen);$('fsExitBtn').addEventListener('click',leaveFullscreen);
   $('fsPrevEdge').addEventListener('click',e=>{e.preventDefault();e.stopPropagation();prev();});
   document.addEventListener('fullscreenchange',onFullscreenChange);document.addEventListener('webkitfullscreenchange',onFullscreenChange);
@@ -814,7 +808,7 @@ body.immersive-fallback #fsPrevEdge{display:flex}
   });
   pageEl.addEventListener('touchstart',e=>{if(e.touches.length!==1||e.target.closest('button,input,select,textarea,a'))return;touchStartX=e.touches[0].clientX;touchStartY=e.touches[0].clientY;},{passive:true});
   pageEl.addEventListener('touchend',e=>{if(touchStartX===null||!e.changedTouches.length)return;const dx=e.changedTouches[0].clientX-touchStartX,dy=e.changedTouches[0].clientY-touchStartY;touchStartX=touchStartY=null;if(Math.abs(dx)>42&&Math.abs(dx)>Math.abs(dy)*1.2)dx<0?next():prev();},{passive:true});
-  $('audioPlay').addEventListener('click',startNarration);$('audioStop').addEventListener('click',()=>stopNarration(true));$('audioMiniPause').addEventListener('click',toggleNarrationPause);$('audioMiniStop').addEventListener('click',()=>stopNarration(true));
+  $('audioPlay').addEventListener('click',startNarration);$('voiceTest').addEventListener('click',testVoice);$('hdVoiceInstall').addEventListener('click',installHdVoices);$('hdNarrator').value=hdNarrator;$('hdNarrator').addEventListener('change',e=>{hdNarrator=e.target.value;localStorage.setItem('scribe-hd-narrator',hdNarrator);restartNarrationCurrent();});$('audioStop').addEventListener('click',()=>stopNarration(true));$('audioMiniPause').addEventListener('click',toggleNarrationPause);$('audioMiniStop').addEventListener('click',()=>stopNarration(true));
   $('speechRate').value=String(speechRate);$('speechRateValue').textContent=speechRate.toFixed(2).replace('.',',');
   $('speechRate').addEventListener('input',e=>{speechRate=Math.max(.75,Math.min(1.2,Number(e.target.value)||.92));$('speechRateValue').textContent=speechRate.toFixed(2).replace('.',',');localStorage.setItem(STORAGE.speechRate,String(speechRate));restartNarrationCurrent();});
   
