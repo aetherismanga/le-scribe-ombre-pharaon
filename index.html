@@ -500,43 +500,19 @@ body.immersive-fallback #fsPrevEdge{display:flex}
   </div>
 </aside><aside class="drawer" id="audioDrawer" aria-label="Lecture vocale">
   <div class="drawer-head"><h2>Lecture vocale</h2><button class="close-btn" data-close>×</button></div>
-  <div class="drawer-body">
-    <div class="audio-controls">
-      <div class="audio-main">
-        <button type="button" class="primary" id="audioPlay">▶ Lire depuis ici</button>
-        <button type="button" id="audioStop">■ Arrêter</button>
-      </div>
-      <div class="audio-setting">
-        <label for="voiceGender">Style de voix</label>
-        <select id="voiceGender">
-          <option value="auto">Automatique — meilleure voix</option>
-          <option value="female">Voix femme</option>
-          <option value="male">Voix homme</option>
-        </select>
-      </div>
-      <div class="audio-setting">
-        <label for="voiceSelect">Voix française</label>
-        <select id="voiceSelect"><option value="">Chargement des voix…</option></select>
-      </div>
-      <div class="audio-row"><button type="button" id="voiceTest">▶ Tester cette voix</button></div>
-      <div class="audio-setting">
-        <label for="speechRate">Vitesse : <span id="speechRateValue">0,92</span></label>
-        <input id="speechRate" type="range" min="0.75" max="1.2" step="0.05" value="0.92">
-      </div>
-      <p class="audio-note">Les voix proposées dépendent des voix françaises installées sur votre téléphone. Les voix Natural, Neural, Premium et Google sont privilégiées.</p>
-      <div class="setting" id="hdVoiceBox" style="margin-top:6px;padding:12px;border:1px solid var(--border);border-radius:10px;background:var(--panel)">
-        <label style="display:block;margin-bottom:7px">✨ Voix HD — sur l’appareil</label>
-        <p class="audio-note" style="margin-bottom:9px">Téléchargement unique d’environ 77 Mo. Ensuite la voix reste stockée sur votre appareil.</p>
-        <div class="audio-row">
-          <button type="button" id="hdVoiceInstall">⬇ Installer le pack HD</button>
-          <button type="button" id="hdVoiceTest" disabled>▶ Tester HD</button>
-          <button type="button" id="hdVoiceRemove" disabled>Supprimer</button>
-        </div>
-        <div class="audio-status" id="hdVoiceStatus" style="margin-top:8px">Pack HD non vérifié sur cet appareil.</div>
-      </div>
-      <div class="audio-status" id="audioStatus">Prêt à lire le roman à voix haute.</div>
+  <div class="drawer-body"><div class="audio-controls">
+    <div class="audio-main"><button type="button" class="primary" id="audioPlay">▶ Lire depuis ici</button><button type="button" id="audioStop">■ Arrêter</button></div>
+    <div class="audio-setting"><label for="hdNarrator">Narrateur</label><select id="hdNarrator"><option value="female">♀ Voix femme</option><option value="male">♂ Voix homme</option></select></div>
+    <div class="audio-row"><button type="button" id="voiceTest">▶ Tester la voix</button></div>
+    <div class="audio-setting"><label for="speechRate">Vitesse : <span id="speechRateValue">0,92</span></label><input id="speechRate" type="range" min="0.75" max="1.2" step="0.05" value="0.92"></div>
+    <div class="setting" id="hdVoiceBox" style="padding:12px;border:1px solid var(--border);border-radius:10px;background:var(--panel)">
+      <strong>Voix du livre</strong>
+      <p class="audio-note" id="hdVoiceInfo" style="margin:7px 0">Les voix sont téléchargées une seule fois puis restent sur cet appareil.</p>
+      <button type="button" id="hdVoiceInstall">⬇ Télécharger les voix</button>
+      <div class="audio-status" id="hdVoiceStatus" style="margin-top:8px">Vérification des voix…</div>
     </div>
-  </div>
+    <div class="audio-status" id="audioStatus">Prêt à lire le roman à voix haute.</div>
+  </div></div>
 </aside>
 
 <div id="audioMini" aria-label="Contrôles de lecture vocale">
@@ -773,7 +749,7 @@ body.immersive-fallback #fsPrevEdge{display:flex}
   }
   function updateAudioUI(){
     const play=$('audioPlay'),mini=$('audioMini'),miniPause=$('audioMiniPause');
-    if(!speechSupported()){play.textContent='Lecture vocale indisponible';play.disabled=true;return;}
+    
     if(narration.active){play.textContent=narration.paused?'▶ Reprendre':'⏸ Pause';mini.classList.add('show');miniPause.textContent=narration.paused?'▶':'⏸';}
     else{play.textContent='▶ Lire depuis ici';mini.classList.remove('show');miniPause.textContent='⏸';}
   }
@@ -785,46 +761,25 @@ body.immersive-fallback #fsPrevEdge{display:flex}
   function syncNarrationPage(sec,pi){
     const target=pageForAnchor(sec+'-'+pi);if(target>=1&&target<=textPages&&target!==current){current=target;render('next');}
   }
-  function speakNarrationParagraph(){
-    if(!narration.active||!speechSupported())return;
+  async function speakNarrationParagraph(){
+    if(!narration.active)return;
     const sec=narration.section,pi=narration.paragraph;
     if(sec>=sections.length){stopNarration(false);showToast('Fin du roman');return;}
-    if(pi>=sections[sec].paragraphs.length){
-      markChapterComplete(sec,true);narration.section=sec+1;narration.paragraph=0;
-      if(narration.section>=sections.length){stopNarration(false);showToast('Fin du roman');return;}
-      goTo(chapterPageIndices[narration.section]||1,'next');setTimeout(speakNarrationParagraph,120);return;
-    }
-    syncNarrationPage(sec,pi);
-    const text=sections[sec].paragraphs[pi].trim();
-    if(!text){narration.paragraph++;speakNarrationParagraph();return;}
-    const utter=new SpeechSynthesisUtterance(text);const v=chosenVoice();if(v)utter.voice=v;utter.lang=(v&&v.lang)||'fr-FR';utter.rate=speechRate;utter.pitch=.96;utter.volume=1;
-    const gen=++speechGeneration;
-    updateAudioStatus(RAW.sections[sec].label+' — '+RAW.sections[sec].title);
-    utter.onend=()=>{if(gen!==speechGeneration||!narration.active)return;narration.paragraph++;setTimeout(speakNarrationParagraph,35);};
-    utter.onerror=e=>{if(gen!==speechGeneration||!narration.active)return;if(e&&e.error==='interrupted')return;stopNarration(false);updateAudioStatus('Lecture interrompue. Vous pouvez relancer depuis cette page.');};
-    window.speechSynthesis.speak(utter);
-    updateAudioUI();
+    if(pi>=sections[sec].paragraphs.length){markChapterComplete(sec,true);narration.section=sec+1;narration.paragraph=0;if(narration.section>=sections.length){stopNarration(false);showToast('Fin du roman');return;}goTo(chapterPageIndices[narration.section]||1,'next');setTimeout(speakNarrationParagraph,120);return;}
+    syncNarrationPage(sec,pi);const text=sections[sec].paragraphs[pi].trim();if(!text){narration.paragraph++;return speakNarrationParagraph();}
+    const gen=++speechGeneration;updateAudioStatus(RAW.sections[sec].label+' — '+RAW.sections[sec].title);
+    try{hdAudio=await makeHdAudio(text);if(gen!==speechGeneration||!narration.active)return;hdAudio.onended=()=>{if(gen!==speechGeneration||!narration.active)return;narration.paragraph++;setTimeout(speakNarrationParagraph,35);};await hdAudio.play();updateAudioUI();}
+    catch(e){stopNarration(false);updateAudioStatus('Lecture interrompue. Touchez Lire pour reprendre.');}
   }
-  function startNarration(){
-    if(!speechSupported()){showToast('Lecture vocale indisponible');return;}
+  async function startNarration(){
     if(narration.active){toggleNarrationPause();return;}
-    if(current===totalPages-1){goTo(1,'next');}
-    if(current===0){goTo(1,'next');}
-    const a=anchorFromCurrent().split('-').map(Number);narration={active:true,paused:false,section:Number.isFinite(a[0])?a[0]:0,paragraph:Number.isFinite(a[1])?a[1]:0};
-    window.speechSynthesis.cancel();speechGeneration++;setTimeout(speakNarrationParagraph,80);updateAudioUI();
+    const s=await hdStored();if(!s[hdNarrator]){await installHdVoices();return;}
+    if(current===totalPages-1||current===0)goTo(1,'next');
+    const a=anchorFromCurrent().split('-').map(Number);narration={active:true,paused:false,section:Number.isFinite(a[0])?a[0]:0,paragraph:Number.isFinite(a[1])?a[1]:0};speechGeneration++;setTimeout(speakNarrationParagraph,50);updateAudioUI();
   }
-  function toggleNarrationPause(){
-    if(!narration.active){startNarration();return;}
-    if(narration.paused){window.speechSynthesis.resume();narration.paused=false;}
-    else{window.speechSynthesis.pause();narration.paused=true;}
-    updateAudioUI();
-  }
-  function stopNarration(showMessage=true){
-    speechGeneration++;if(speechSupported())window.speechSynthesis.cancel();narration.active=false;narration.paused=false;updateAudioUI();updateAudioStatus('Prêt à lire le roman à voix haute.');if(showMessage)showToast('Lecture vocale arrêtée');
-  }
-  function restartNarrationCurrent(){
-    if(!narration.active)return;speechGeneration++;window.speechSynthesis.cancel();narration.paused=false;setTimeout(speakNarrationParagraph,90);updateAudioUI();
-  }
+  function toggleNarrationPause(){if(!narration.active){startNarration();return;}if(!hdAudio)return;if(narration.paused){hdAudio.play();narration.paused=false;}else{hdAudio.pause();narration.paused=true;}updateAudioUI();}
+  function stopNarration(showMessage=true){speechGeneration++;if(hdAudio){hdAudio.pause();hdAudio=null;}narration.active=false;narration.paused=false;updateAudioUI();updateAudioStatus('Prêt à lire le roman à voix haute.');if(showMessage)showToast('Lecture vocale arrêtée');}
+  function restartNarrationCurrent(){if(!narration.active)return;speechGeneration++;if(hdAudio)hdAudio.pause();narration.paused=false;setTimeout(speakNarrationParagraph,50);updateAudioUI();}
 
   function nativeFullscreenElement(){return document.fullscreenElement||document.webkitFullscreenElement||null;}
   function fullscreenActive(){return !!nativeFullscreenElement()||immersiveFallback;}
@@ -862,61 +817,7 @@ body.immersive-fallback #fsPrevEdge{display:flex}
   $('audioPlay').addEventListener('click',startNarration);$('audioStop').addEventListener('click',()=>stopNarration(true));$('audioMiniPause').addEventListener('click',toggleNarrationPause);$('audioMiniStop').addEventListener('click',()=>stopNarration(true));
   $('voiceSelect').addEventListener('change',e=>{selectedVoiceURI=e.target.value||'';if(selectedVoiceURI)localStorage.setItem(STORAGE.voice,selectedVoiceURI);else localStorage.removeItem(STORAGE.voice);restartNarrationCurrent();});
   $('voiceGender').value=selectedVoiceGender;
-  $('voiceGender').addEventListener('change',e=>{selectedVoiceGender=e.target.value||'auto';localStorage.setItem(STORAGE.voiceGender,selectedVoiceGender);selectedVoiceURI='';localStorage.removeItem(STORAGE.voice);populateVoiceSelect();restartNarrationCurrent();});
-  $('voiceTest').addEventListener('click',testVoice);
-
-  const HD_VOICE_ID='fr_FR-upmc-medium';
-  let hdTts=null;
-  async function loadHdTts(){
-    if(hdTts)return hdTts;
-    $('hdVoiceStatus').textContent='Chargement du moteur vocal HD…';
-    hdTts=await import('https://cdn.jsdelivr.net/npm/@realtimex/piper-tts-web@1.1.1/+esm');
-    return hdTts;
-  }
-  function friendlyHdError(e){
-    const m=String(e&&e.message||e||'');
-    if(/onnx|wasm|backend|dynamically imported|failed to fetch/i.test(m))return 'Le moteur vocal HD n’a pas pu démarrer. Fermez puis rouvrez l’application et réessayez.';
-    return 'La voix HD n’a pas pu démarrer. Réessayez dans quelques instants.';
-  }
-  async function refreshHdVoiceState(){
-    try{
-      const t=await loadHdTts(),stored=await t.stored(),ok=Array.isArray(stored)&&stored.includes(HD_VOICE_ID);
-      $('hdVoiceTest').disabled=!ok;$('hdVoiceRemove').disabled=!ok;
-      $('hdVoiceInstall').textContent=ok?'✓ Pack HD installé':'⬇ Installer le pack HD';
-      $('hdVoiceStatus').textContent=ok?'Pack HD installé localement — prêt à tester.':'Pack HD non installé (~77 Mo).';
-    }catch(e){$('hdVoiceStatus').textContent=friendlyHdError(e);}
-  }
-  $('hdVoiceInstall').addEventListener('click',async()=>{
-    const b=$('hdVoiceInstall');b.disabled=true;
-    try{
-      const t=await loadHdTts();
-      $('hdVoiceStatus').textContent='Téléchargement du pack HD…';
-      await t.download(HD_VOICE_ID,p=>{
-        const pct=p&&p.total?Math.min(100,Math.round((p.loaded||0)*100/p.total)):0;
-        $('hdVoiceStatus').textContent='Téléchargement du pack HD… '+(pct?pct+' %':'');
-      });
-      $('hdVoiceStatus').textContent='Pack HD installé localement.';
-      $('hdVoiceTest').disabled=false;$('hdVoiceRemove').disabled=false;b.textContent='✓ Pack HD installé';
-    }catch(e){$('hdVoiceStatus').textContent=friendlyHdError(e);}
-    finally{b.disabled=false;}
-  });
-  $('hdVoiceTest').addEventListener('click',async()=>{
-    const b=$('hdVoiceTest');b.disabled=true;
-    try{
-      const t=await loadHdTts();$('hdVoiceStatus').textContent='Génération locale de la voix HD…';
-      const wav=await t.predict({text:'La nuit tombe sur les rives du Nil. Dans le silence, le scribe reprend son calame.',voiceId:HD_VOICE_ID,allowLocalModels:true,fallbackStrategy:'auto'});
-      const u=URL.createObjectURL(wav),a=new Audio(u);a.onended=()=>URL.revokeObjectURL(u);await a.play();
-      $('hdVoiceStatus').textContent='Lecture HD locale réussie.';
-    }catch(e){$('hdVoiceStatus').textContent=friendlyHdError(e);}
-    finally{b.disabled=false;}
-  });
-  $('hdVoiceRemove').addEventListener('click',async()=>{
-    try{const t=await loadHdTts();await t.remove(HD_VOICE_ID);$('hdVoiceStatus').textContent='Pack HD supprimé de cet appareil.';$('hdVoiceTest').disabled=true;$('hdVoiceRemove').disabled=true;$('hdVoiceInstall').textContent='⬇ Installer le pack HD';}catch(e){$('hdVoiceStatus').textContent='Suppression impossible.';}
-  });
-  $('audioBtn').addEventListener('click',()=>{setTimeout(refreshHdVoiceState,50);});
-  loadSpeechVoices();
-  if(speechSupported()){window.speechSynthesis.addEventListener('voiceschanged',loadSpeechVoices);setTimeout(loadSpeechVoices,250);setTimeout(loadSpeechVoices,1200);}
-  $('speechRate').value=String(speechRate);$('speechRateValue').textContent=speechRate.toFixed(2).replace('.',',');
+    $('speechRate').value=String(speechRate);$('speechRateValue').textContent=speechRate.toFixed(2).replace('.',',');
   $('speechRate').addEventListener('input',e=>{speechRate=Math.max(.75,Math.min(1.2,Number(e.target.value)||.92));$('speechRateValue').textContent=speechRate.toFixed(2).replace('.',',');localStorage.setItem(STORAGE.speechRate,String(speechRate));restartNarrationCurrent();});
   
   const handleViewportChange=()=>{clearTimeout(resizeTimer);const a=captureVisibleAnchor()||savedAnchor;syncViewportMetrics();resizeTimer=setTimeout(()=>{if(current>0&&current<totalPages-1){pageEl.className='page text-flow-page';pageEl.innerHTML=buildFlow();}recalcLayout(a);},160);};
