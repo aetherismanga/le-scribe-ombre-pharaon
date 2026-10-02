@@ -40,6 +40,25 @@ button{cursor:pointer}
 @keyframes prevPage{from{transform:translateX(-18px);opacity:.55}to{transform:none;opacity:1}}
 .cover-page{padding:0;overflow:hidden;background:#17130f;display:flex;align-items:center;justify-content:center}
 .cover-page img{width:100%;height:auto;display:block;max-height:calc(100vh - 105px);object-fit:contain;background:#17130f}
+.end-page{padding:0!important;overflow:auto!important;background:linear-gradient(180deg,#1b120b 0%,#5f351d 38%,#e8c78f 100%)!important;color:#fff;display:block!important;min-height:calc(100vh - 120px)}
+.end-hero{position:relative;min-height:280px;padding:52px 26px 34px;text-align:center;display:flex;align-items:flex-end;justify-content:center;background:linear-gradient(180deg,rgba(20,10,4,.12),rgba(20,10,4,.78)),url("${BACK}") center/cover no-repeat}
+.end-hero-inner{max-width:650px;text-shadow:0 2px 12px rgba(0,0,0,.55)}
+.end-kicker{font-size:.76rem;letter-spacing:.22em;text-transform:uppercase;font-weight:800;opacity:.88}
+.end-title{font-family:Georgia,serif;font-size:clamp(2rem,7vw,3.6rem);line-height:1.05;margin:10px 0 14px}
+.end-thanks{font-family:Georgia,serif;font-size:clamp(1rem,3.6vw,1.18rem);line-height:1.65;margin:0 auto;max-width:610px}
+.end-sign{margin-top:14px;font-weight:800;letter-spacing:.04em}
+.end-panel{background:#f7eddc;color:#2a2118;margin:0;padding:28px clamp(18px,5vw,38px) 36px}
+.end-card{max-width:650px;margin:0 auto;background:rgba(255,255,255,.78);border:1px solid rgba(112,75,36,.25);border-radius:22px;padding:22px;box-shadow:0 12px 32px rgba(59,36,15,.13)}
+.end-card h2{font-family:Georgia,serif;margin:0 0 7px;font-size:1.55rem}.end-card p{margin:0 0 18px;color:#6a5a49;line-height:1.5}
+.rating-row{display:flex;justify-content:center;gap:6px;margin:6px 0 18px}
+.star-btn{border:0;background:transparent;font-size:2.25rem;line-height:1;color:#b9aa96;padding:4px;cursor:pointer}.star-btn.on{color:#a06b22}
+.end-card textarea{width:100%;min-height:110px;resize:vertical;border:1px solid #cbb99e;border-radius:14px;background:#fffdf9;color:#2a2118;padding:13px;font:inherit;box-sizing:border-box}
+.end-question{font-weight:800;margin:20px 0 10px}
+.end-choice{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.end-choice button{border:1px solid #b99b72;background:#fffaf1;color:#3a2a1c;border-radius:12px;padding:11px 7px;font-weight:700}.end-choice button.selected{background:#8a6229;color:#fff;border-color:#8a6229}
+.end-submit{width:100%;margin-top:18px;border:0;border-radius:14px;padding:14px 18px;background:#6f4b20;color:white;font-weight:800;font-size:1rem}.end-submit:disabled{opacity:.45}
+.end-note{text-align:center;font-size:.8rem!important;margin:12px 0 0!important;color:#85735f!important}
+.end-confirm{display:none;margin-top:16px;padding:13px;border-radius:12px;background:#e7f0df;color:#355126;text-align:center;font-weight:700}.end-confirm.show{display:block}
+@media(max-width:560px){.end-hero{min-height:250px;padding:42px 18px 28px}.end-panel{padding:20px 12px 30px}.end-card{padding:18px 14px;border-radius:18px}.end-choice{grid-template-columns:1fr}.star-btn{font-size:2rem}}
 .chapter-illustration{margin:0 auto 28px;max-width:680px;break-inside:avoid;page-break-inside:avoid;text-align:center}
 .chapter-illustration img{display:block;width:100%;height:auto;max-height:min(66vh,760px);object-fit:contain;border-radius:18px}
 @media(max-width:640px){.chapter-illustration{margin:0 auto 22px}.chapter-illustration img{max-height:58vh;border-radius:16px}}
@@ -600,6 +619,20 @@ body.immersive-fallback #fsPrevEdge{display:flex}
     }).join('');
     return '<div class="flow-viewport" id="flowViewport"><div class="flow-content" id="flowContent">'+html+'</div></div>';
   }
+  function buildEndPage(){
+    const saved=(()=>{try{return JSON.parse(localStorage.getItem('scribe.reader.feedback')||'{}')}catch(_){return {}}})();
+    const rating=Number(saved.rating)||0, sequel=saved.sequel||'', comment=esc(saved.comment||'');
+    return '<div class="end-hero"><div class="end-hero-inner"><div class="end-kicker">Le Scribe et l’Ombre de Pharaon</div><div class="end-title">Merci d’avoir suivi cette aventure</div><p class="end-thanks">J’espère que Nakht, Néferet, Hori et Miu vous auront fait voyager au cœur de l’Égypte de Ramsès. Ce roman est né de mon envie de raconter une aventure, de faire vivre une époque et surtout de partager une histoire avec vous.</p><div class="end-sign">Merci sincèrement d’avoir tourné toutes ces pages.<br>— Le Grognard du Net</div></div></div>'+
+      '<div class="end-panel"><div class="end-card"><h2>Vous avez aimé l’aventure ?</h2><p>Votre avis m’intéresse. Quelques secondes suffisent.</p><div class="rating-row" aria-label="Note sur 5">'+[1,2,3,4,5].map(n=>'<button class="star-btn '+(n<=rating?'on':'')+'" type="button" data-rate="'+n+'" aria-label="'+n+' étoile'+(n>1?'s':'')+'">★</button>').join('')+'</div><textarea id="readerReview" maxlength="1200" placeholder="Écrivez quelques mots sur le roman…">'+comment+'</textarea><div class="end-question">Aimeriez-vous retrouver Nakht et Néferet dans une nouvelle aventure ?</div><div class="end-choice"><button type="button" data-sequel="oui" class="'+(sequel==='oui'?'selected':'')+'">Oui, absolument</button><button type="button" data-sequel="peut-etre" class="'+(sequel==='peut-etre'?'selected':'')+'">Peut-être</button><button type="button" data-sequel="non" class="'+(sequel==='non'?'selected':'')+'">Non</button></div><button class="end-submit" id="saveReaderReview" type="button">Enregistrer mon avis</button><div class="end-confirm '+(saved.saved?'show':'')+'" id="reviewConfirm">Merci. Votre avis a bien été enregistré sur cet appareil.</div><p class="end-note">Aucun compte nécessaire.</p></div></div>';
+  }
+  function bindEndPage(){
+    const root=pageEl; let rating=0,sequel='';
+    try{const s=JSON.parse(localStorage.getItem('scribe.reader.feedback')||'{}');rating=Number(s.rating)||0;sequel=s.sequel||'';}catch(_){}
+    root.querySelectorAll('[data-rate]').forEach(b=>b.addEventListener('click',()=>{rating=Number(b.dataset.rate);root.querySelectorAll('[data-rate]').forEach(x=>x.classList.toggle('on',Number(x.dataset.rate)<=rating));}));
+    root.querySelectorAll('[data-sequel]').forEach(b=>b.addEventListener('click',()=>{sequel=b.dataset.sequel;root.querySelectorAll('[data-sequel]').forEach(x=>x.classList.toggle('selected',x===b));}));
+    const save=root.querySelector('#saveReaderReview'); if(save)save.addEventListener('click',()=>{const comment=(root.querySelector('#readerReview')?.value||'').trim();localStorage.setItem('scribe.reader.feedback',JSON.stringify({rating,sequel,comment,saved:true,updatedAt:new Date().toISOString()}));const ok=root.querySelector('#reviewConfirm');if(ok)ok.classList.add('show');});
+  }
+
   function setTheme(theme){
     theme=theme==='white'?'white':'ivory'; document.body.classList.toggle('theme-white',theme==='white');document.body.classList.toggle('theme-ivory',theme==='ivory');
     localStorage.setItem(STORAGE.theme,theme);document.querySelectorAll('[data-theme]').forEach(b=>b.classList.toggle('selected',b.dataset.theme===theme));
@@ -668,7 +701,7 @@ body.immersive-fallback #fsPrevEdge{display:flex}
   function render(direction='next',save=true){
     current=Math.max(0,Math.min(totalPages-1,current));
     if(current===0){pageEl.className='page cover-page '+(direction==='prev'?'turn-prev':'turn-next');pageEl.innerHTML='<img src="'+FRONT+'" alt="Couverture — Le Scribe et l’Ombre de Pharaon" fetchpriority="high" decoding="async">';}
-    else if(current===totalPages-1){pageEl.className='page cover-page '+(direction==='prev'?'turn-prev':'turn-next');pageEl.innerHTML='<img src="'+BACK+'" alt="Quatrième de couverture — Le Scribe et l’Ombre de Pharaon">';}
+    else if(current===totalPages-1){pageEl.className='page end-page '+(direction==='prev'?'turn-prev':'turn-next');pageEl.innerHTML=buildEndPage();bindEndPage();}
     else{
       if(!flow()){pageEl.className='page text-flow-page';pageEl.innerHTML=buildFlow();requestAnimationFrame(()=>recalcLayout(savedAnchor));return;}
       pageEl.className='page text-flow-page '+(direction==='prev'?'turn-prev':'turn-next');
