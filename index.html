@@ -736,6 +736,16 @@ html:fullscreen #audioMini.show,html:-webkit-full-screen #audioMini.show{display
   $('resetReading').addEventListener('click',()=>{goTo(0,'prev');closeDrawers();showToast('Retour à la couverture');});
   $('resumeBtn').addEventListener('click',()=>{if(savedAnchor){current=pageForAnchor(savedAnchor);render('next');$('resumeBanner').classList.remove('show');}});
   $('app').addEventListener('keydown',e=>{if(e.target.matches('input,select,textarea,button'))return;if(e.key==='ArrowRight'||e.key==='PageDown'){e.preventDefault();next();}if(e.key==='ArrowLeft'||e.key==='PageUp'){e.preventDefault();prev();}});
+  // Navigation souris PC : clic à gauche = page précédente, clic à droite = page suivante.
+  pageEl.addEventListener('click',e=>{
+    if(!window.matchMedia('(hover:hover) and (pointer:fine)').matches)return;
+    if(e.button!==0||e.target.closest('button,input,select,textarea,a'))return;
+    const sel=window.getSelection&&window.getSelection();
+    if(sel&&String(sel).trim())return;
+    const r=pageEl.getBoundingClientRect();
+    const x=e.clientX-r.left;
+    if(x<r.width/2)prev(); else next();
+  });
   pageEl.addEventListener('touchstart',e=>{if(e.touches.length!==1||e.target.closest('button,input,select,textarea,a'))return;touchStartX=e.touches[0].clientX;touchStartY=e.touches[0].clientY;},{passive:true});
   pageEl.addEventListener('touchend',e=>{if(touchStartX===null||!e.changedTouches.length)return;const dx=e.changedTouches[0].clientX-touchStartX,dy=e.changedTouches[0].clientY-touchStartY;touchStartX=touchStartY=null;if(Math.abs(dx)>42&&Math.abs(dx)>Math.abs(dy)*1.2)dx<0?next():prev();},{passive:true});
   $('audioPlay').addEventListener('click',startNarration);$('audioStop').addEventListener('click',()=>stopNarration(true));$('audioMiniPause').addEventListener('click',toggleNarrationPause);$('audioMiniStop').addEventListener('click',()=>stopNarration(true));
