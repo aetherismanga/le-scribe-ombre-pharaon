@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#efe4c8">
-<link rel="manifest" href="manifest.webmanifest">
+<link rel="manifest" href="manifest.webmanifest">\n<link rel="preload" as="image" href="images/Le Scribe et l’Ombre du Pharaon.png" fetchpriority="high">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icon.svg">
 <meta name="mobile-web-app-capable" content="yes">
@@ -562,7 +562,7 @@ body.immersive-fallback #fsPrevEdge{display:flex}
         const cls=[p.trim().startsWith('—')?'dialogue':'',pi===0?'first-para':''].filter(Boolean).join(' ');
         return '<p id="a-'+si+'-'+pi+'" data-anchor="'+si+'-'+pi+'" class="'+cls+'">'+esc(p)+'</p>';
       }).join('');
-      const art=CHAPTER_IMAGES[si]?'<figure class="chapter-illustration"><img src="'+CHAPTER_IMAGES[si]+'" alt="'+esc(s.label)+' — '+esc(s.title)+'"></figure>':'';
+      const art=CHAPTER_IMAGES[si]?'<figure class="chapter-illustration"><img src="'+CHAPTER_IMAGES[si]+'" alt="'+esc(s.label)+' — '+esc(s.title)+'" loading="lazy" fetchpriority="low" decoding="async"></figure>':'';
       return '<section class="flow-chapter" id="chapter-'+si+'" data-section="'+si+'">'+art+'<div class="flow-chapter-head"><div class="chapter-kicker">'+esc(s.label)+'</div><h1 class="chapter-title">'+esc(s.title)+'</h1></div>'+paras+'</section>';
     }).join('');
     return '<div class="flow-viewport" id="flowViewport"><div class="flow-content" id="flowContent">'+html+'</div></div>';
@@ -634,7 +634,7 @@ body.immersive-fallback #fsPrevEdge{display:flex}
 
   function render(direction='next',save=true){
     current=Math.max(0,Math.min(totalPages-1,current));
-    if(current===0){pageEl.className='page cover-page '+(direction==='prev'?'turn-prev':'turn-next');pageEl.innerHTML='<img src="'+FRONT+'" alt="Couverture — Le Scribe et l’Ombre de Pharaon">';}
+    if(current===0){pageEl.className='page cover-page '+(direction==='prev'?'turn-prev':'turn-next');pageEl.innerHTML='<img src="'+FRONT+'" alt="Couverture — Le Scribe et l’Ombre de Pharaon" fetchpriority="high" decoding="async">';}
     else if(current===totalPages-1){pageEl.className='page cover-page '+(direction==='prev'?'turn-prev':'turn-next');pageEl.innerHTML='<img src="'+BACK+'" alt="Quatrième de couverture — Le Scribe et l’Ombre de Pharaon">';}
     else{
       if(!flow()){pageEl.className='page text-flow-page';pageEl.innerHTML=buildFlow();requestAnimationFrame(()=>recalcLayout(savedAnchor));return;}
