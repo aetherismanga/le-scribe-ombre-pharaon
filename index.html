@@ -515,6 +515,16 @@ body.immersive-fallback #fsPrevEdge{display:flex}
         <input id="speechRate" type="range" min="0.75" max="1.2" step="0.05" value="0.92">
       </div>
       <p class="audio-note">Les voix proposées dépendent des voix françaises installées sur votre téléphone. Les voix Natural, Neural, Premium et Google sont privilégiées.</p>
+      <div class="setting" id="hdVoiceBox" style="margin-top:6px;padding:12px;border:1px solid var(--border);border-radius:10px;background:var(--panel)">
+        <label style="display:block;margin-bottom:7px">✨ Voix HD locale — bêta</label>
+        <p class="audio-note" style="margin-bottom:9px">Piper fonctionne directement sur votre appareil. Le pack français (~77 Mo) n’est téléchargé qu’à votre demande puis conservé localement.</p>
+        <div class="audio-row">
+          <button type="button" id="hdVoiceInstall">⬇ Installer le pack HD</button>
+          <button type="button" id="hdVoiceTest" disabled>▶ Tester HD</button>
+          <button type="button" id="hdVoiceRemove" disabled>Supprimer</button>
+        </div>
+        <div class="audio-status" id="hdVoiceStatus" style="margin-top:8px">Pack HD non vérifié sur cet appareil.</div>
+      </div>
       <div class="audio-status" id="audioStatus">Prêt à lire le roman à voix haute.</div>
     </div>
   </div>
@@ -845,6 +855,51 @@ body.immersive-fallback #fsPrevEdge{display:flex}
   $('voiceGender').value=selectedVoiceGender;
   $('voiceGender').addEventListener('change',e=>{selectedVoiceGender=e.target.value||'auto';localStorage.setItem(STORAGE.voiceGender,selectedVoiceGender);selectedVoiceURI='';localStorage.removeItem(STORAGE.voice);populateVoiceSelect();restartNarrationCurrent();});
   $('voiceTest').addEventListener('click',testVoice);
+
+  const HD_VOICE_ID='fr_FR-upmc-medium';
+  let hdTts=null;
+  async function loadHdTts(){
+    if(hdTts)return hdTts;
+    $('hdVoiceStatus').textContent='Chargement du moteur vocal HD…';
+    hdTts=await import('https://cdn.jsdelivr.net/npm/@mintplex-labs/piper-tts-web@1.0.5/+esm');
+    return hdTts;
+  }
+  async function refreshHdVoiceState(){
+    try{
+      const t=await loadHdTts(),stored=await t.stored(),ok=Array.isArray(stored)&&stored.includes(HD_VOICE_ID);
+      $('hdVoiceTest').disabled=!ok;$('hdVoiceRemove').disabled=!ok;
+      $('hdVoiceInstall').textContent=ok?'✓ Pack HD installé':'⬇ Installer le pack HD';
+      $('hdVoiceStatus').textContent=ok?'Pack HD installé localement — prêt à tester.':'Pack HD non installé (~77 Mo).';
+    }catch(e){$('hdVoiceStatus').textContent='Voix HD indisponible sur ce navigateur : '+(e&&e.message?e.message:'erreur de chargement');}
+  }
+  $('hdVoiceInstall').addEventListener('click',async()=>{
+    const b=$('hdVoiceInstall');b.disabled=true;
+    try{
+      const t=await loadHdTts();
+      $('hdVoiceStatus').textContent='Téléchargement du pack HD…';
+      await t.download(HD_VOICE_ID,p=>{
+        const pct=p&&p.total?Math.min(100,Math.round((p.loaded||0)*100/p.total)):0;
+        $('hdVoiceStatus').textContent='Téléchargement du pack HD… '+(pct?pct+' %':'');
+      });
+      $('hdVoiceStatus').textContent='Pack HD installé localement.';
+      $('hdVoiceTest').disabled=false;$('hdVoiceRemove').disabled=false;b.textContent='✓ Pack HD installé';
+    }catch(e){$('hdVoiceStatus').textContent='Échec du téléchargement : '+(e&&e.message?e.message:'erreur inconnue');}
+    finally{b.disabled=false;}
+  });
+  $('hdVoiceTest').addEventListener('click',async()=>{
+    const b=$('hdVoiceTest');b.disabled=true;
+    try{
+      const t=await loadHdTts();$('hdVoiceStatus').textContent='Génération locale de la voix HD…';
+      const wav=await t.predict({text:'La nuit tombe sur les rives du Nil. Dans le silence, le scribe reprend son calame.',voiceId:HD_VOICE_ID});
+      const u=URL.createObjectURL(wav),a=new Audio(u);a.onended=()=>URL.revokeObjectURL(u);await a.play();
+      $('hdVoiceStatus').textContent='Lecture HD locale réussie.';
+    }catch(e){$('hdVoiceStatus').textContent='Test HD impossible : '+(e&&e.message?e.message:'erreur inconnue');}
+    finally{b.disabled=false;}
+  });
+  $('hdVoiceRemove').addEventListener('click',async()=>{
+    try{const t=await loadHdTts();await t.remove(HD_VOICE_ID);$('hdVoiceStatus').textContent='Pack HD supprimé de cet appareil.';$('hdVoiceTest').disabled=true;$('hdVoiceRemove').disabled=true;$('hdVoiceInstall').textContent='⬇ Installer le pack HD';}catch(e){$('hdVoiceStatus').textContent='Suppression impossible.';}
+  });
+  $('audioBtn').addEventListener('click',()=>{setTimeout(refreshHdVoiceState,50);});
   loadSpeechVoices();
   if(speechSupported()){window.speechSynthesis.addEventListener('voiceschanged',loadSpeechVoices);setTimeout(loadSpeechVoices,250);setTimeout(loadSpeechVoices,1200);}
   $('speechRate').value=String(speechRate);$('speechRateValue').textContent=speechRate.toFixed(2).replace('.',',');
