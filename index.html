@@ -529,7 +529,7 @@ body.immersive-fallback #fsPrevEdge{display:flex}
   <div class="drawer-head"><h2>Lecture vocale</h2><button class="close-btn" data-close>×</button></div>
   <div class="drawer-body"><div class="audio-controls">
     <div class="audio-main"><button type="button" class="primary" id="audioPlay">▶ Lire depuis ici</button><button type="button" id="audioStop">■ Arrêter</button></div>
-    <div class="audio-setting"><label for="hdNarrator">Narrateur</label><select id="hdNarrator"><option value="upmc">♀ Jessica</option><option value="siwis">♀ Siwis</option><option value="tom">♂ Tom</option><option value="gilles">♂ Gilles</option></select></div>
+    <div class="audio-setting"><label for="hdNarrator">Narrateur</label><select id="hdNarrator"><option value="upmc">♀ Jessica</option><option value="siwis">♀ Siwis</option><option value="tom">♂ Tom</option><option value="mls1840">♂ MLS 1840</option></select></div>
     <div class="audio-row"><button type="button" id="voiceTest">▶ Tester la voix</button></div>
     <div class="audio-setting"><label for="speechRate">Vitesse : <span id="speechRateValue">0,92</span></label><input id="speechRate" type="range" min="0.75" max="1.2" step="0.05" value="0.92"></div>
     <div class="setting" id="hdVoiceBox" style="padding:12px;border:1px solid var(--border);border-radius:10px;background:var(--panel)">
@@ -803,7 +803,7 @@ body.immersive-fallback #fsPrevEdge{display:flex}
   async function testVoice(){try{if(!(await hdStored())){await installHdVoices();return;}if(hdAudio){hdAudio.pause();hdAudio=null;}hdAudio=await makeHdAudio('Bienvenue dans Le Scribe et l’Ombre de Pharaon. La nuit tombe sur les rives du Nil.');await hdAudio.play();}catch(e){$('hdVoiceStatus').textContent=friendlyHdError(e);}}
   const HD_VOICE_ID='fr_FR-upmc-medium';
   let hdTts=null,hdNarrator=localStorage.getItem('scribe-hd-narrator')||'upmc',hdAudio=null;
-  const HD_VOICES={upmc:'fr_FR-upmc-medium',siwis:'fr_FR-siwis-medium',tom:'fr_FR-tom-medium',gilles:'fr_FR-gilles-low'};
+  const HD_VOICES={upmc:'fr_FR-upmc-medium',siwis:'fr_FR-siwis-medium',tom:'fr_FR-tom-medium',mls1840:'fr_FR-mls_1840-low'};
   const hdVoiceId=()=>HD_VOICES[hdNarrator]||HD_VOICES.upmc;
   async function loadHdTts(){if(hdTts)return hdTts;$('hdVoiceStatus').textContent='Chargement du moteur vocal…';hdTts=await import('https://cdn.jsdelivr.net/npm/@realtimex/piper-tts-web@1.1.1/+esm');return hdTts;}
   function friendlyHdError(e){const m=String(e&&e.message||e||'Erreur inconnue');return 'Erreur voix : '+m.slice(0,180);}
