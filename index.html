@@ -870,12 +870,12 @@ body.immersive-fallback #fsPrevEdge{display:flex}
   async function loadHdTts(){
     if(hdTts)return hdTts;
     $('hdVoiceStatus').textContent='Chargement du moteur vocal HD…';
-    hdTts=await import('https://cdn.jsdelivr.net/npm/@mintplex-labs/piper-tts-web@1.0.5/+esm');
+    hdTts=await import('https://cdn.jsdelivr.net/npm/@realtimex/piper-tts-web@1.1.1/+esm');
     return hdTts;
   }
   function friendlyHdError(e){
     const m=String(e&&e.message||e||'');
-    if(/onnx|wasm|backend|dynamically imported|failed to fetch/i.test(m))return 'Le moteur vocal HD n’a pas pu démarrer sur ce téléphone. Le pack est bien installé : correction du moteur nécessaire.';
+    if(/onnx|wasm|backend|dynamically imported|failed to fetch/i.test(m))return 'Le moteur vocal HD n’a pas pu démarrer. Fermez puis rouvrez l’application et réessayez.';
     return 'La voix HD n’a pas pu démarrer. Réessayez dans quelques instants.';
   }
   async function refreshHdVoiceState(){
@@ -904,7 +904,7 @@ body.immersive-fallback #fsPrevEdge{display:flex}
     const b=$('hdVoiceTest');b.disabled=true;
     try{
       const t=await loadHdTts();$('hdVoiceStatus').textContent='Génération locale de la voix HD…';
-      const wav=await t.predict({text:'La nuit tombe sur les rives du Nil. Dans le silence, le scribe reprend son calame.',voiceId:HD_VOICE_ID});
+      const wav=await t.predict({text:'La nuit tombe sur les rives du Nil. Dans le silence, le scribe reprend son calame.',voiceId:HD_VOICE_ID,allowLocalModels:true,fallbackStrategy:'auto'});
       const u=URL.createObjectURL(wav),a=new Audio(u);a.onended=()=>URL.revokeObjectURL(u);await a.play();
       $('hdVoiceStatus').textContent='Lecture HD locale réussie.';
     }catch(e){$('hdVoiceStatus').textContent=friendlyHdError(e);}
