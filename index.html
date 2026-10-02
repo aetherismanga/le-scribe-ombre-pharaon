@@ -694,15 +694,16 @@ body.immersive-fallback #fsPrevEdge{display:flex}
     syncViewportMetrics();
     const f=flow(),c=flowContent(); if(!f||!c)return;
     const w=columnWidth(); c.style.columnWidth=w+'px';
-    // First reset to the beginning so geometry is deterministic.
-    f.scrollLeft=0;
+    // Keep the currently displayed column in place. Resetting scrollLeft here caused
+    // a visible white/first-column flash during Android fullscreen viewport changes.
+    const visibleLeft=f.scrollLeft;
     requestAnimationFrame(()=>{
       textPages=Math.max(1,Math.ceil((c.scrollWidth-1)/w)); totalPages=textPages+3;
       chapterPageIndices=[];pageSections=[];
       const fr=f.getBoundingClientRect();
       RAW.sections.forEach((_,si)=>{
         const chapter=$('chapter-'+si),el=chapter&&(chapter.querySelector('.chapter-illustration')||chapter); const er=el.getBoundingClientRect();
-        const absLeft=(er.left-fr.left)+f.scrollLeft;
+        const absLeft=(er.left-fr.left)+visibleLeft;
         const p=1+Math.max(0,Math.floor((absLeft+2)/w));
         chapterPageIndices[si]=Math.min(textPages,p);
       });
@@ -861,7 +862,7 @@ body.immersive-fallback #fsPrevEdge{display:flex}
   let fullscreenReflowTimer=null,fullscreenAnchor='';
   function settleFullscreenLayout(anchor){
     clearTimeout(fullscreenReflowTimer);
-    fullscreenReflowTimer=setTimeout(()=>{recalcLayout(anchor||fullscreenAnchor||savedAnchor);fullscreenAnchor='';},260);
+    fullscreenReflowTimer=setTimeout(()=>{recalcLayout(anchor||fullscreenAnchor||savedAnchor);fullscreenAnchor='';},420);
   }
   async function leaveFullscreen(){fullscreenAnchor=captureVisibleAnchor()||savedAnchor;if(nativeFullscreenElement()){try{await exitNativeFullscreen();}catch(_){}}immersiveFallback=false;document.body.classList.remove('immersive-fallback');updateFullscreenButton();settleFullscreenLayout(fullscreenAnchor);}
   async function toggleFullscreen(){fullscreenAnchor=captureVisibleAnchor()||savedAnchor;closeDrawers();try{if(fullscreenActive()){await leaveFullscreen();return;}const entered=await enterNativeFullscreen();if(!entered){immersiveFallback=true;document.body.classList.add('immersive-fallback');updateFullscreenButton();settleFullscreenLayout(fullscreenAnchor);}}catch(_){immersiveFallback=true;document.body.classList.add('immersive-fallback');updateFullscreenButton();showToast('Le navigateur bloque le plein écran natif');settleFullscreenLayout(fullscreenAnchor);}}
@@ -895,9 +896,9 @@ body.immersive-fallback #fsPrevEdge{display:flex}
   $('speechRate').value=String(speechRate);$('speechRateValue').textContent=speechRate.toFixed(2).replace('.',',');
   $('speechRate').addEventListener('input',e=>{speechRate=Math.max(.75,Math.min(1.2,Number(e.target.value)||.92));$('speechRateValue').textContent=speechRate.toFixed(2).replace('.',',');localStorage.setItem(STORAGE.speechRate,String(speechRate));restartNarrationCurrent();});
   
-  const handleViewportChange=()=>{clearTimeout(resizeTimer);const a=fullscreenAnchor||captureVisibleAnchor()||savedAnchor;syncViewportMetrics();resizeTimer=setTimeout(()=>recalcLayout(a),220);};
+  const handleViewportChange=()=>{clearTimeout(resizeTimer);const a=fullscreenAnchor||captureVisibleAnchor()||savedAnchor;syncViewportMetrics();resizeTimer=setTimeout(()=>recalcLayout(a),360);};
   window.addEventListener('resize',handleViewportChange,{passive:true});
-  if(window.visualViewport){window.visualViewport.addEventListener('resize',handleViewportChange,{passive:true});window.visualViewport.addEventListener('scroll',handleViewportChange,{passive:true});}
+  if(window.visualViewport){window.visualViewport.addEventListener('resize',handleViewportChange,{passive:true});}
 
   if(completedSections.size===0&&savedAnchor){const parts=savedAnchor.split('-').map(Number),savedSec=parts[0];if(Number.isInteger(savedSec)&&savedSec>0){for(let i=0;i<savedSec;i++)completedSections.add(i);saveCompleted();}}
   syncViewportMetrics();setTheme(savedTheme);setSize(savedSize,false);setLine(savedLine,false);renderLexicon();updateFullscreenButton();
@@ -925,7 +926,7 @@ body.immersive-fallback #fsPrevEdge{display:flex}
       swReloaded=true;
       location.reload();
     });
-    navigator.serviceWorker.register('sw.js?v=20261003-fsfix',{updateViaCache:'none'}).then(reg=>{
+    navigator.serviceWorker.register('sw.js?v=20261003-fsfix2',{updateViaCache:'none'}).then(reg=>{
       reg.update().catch(()=>{});
       if(reg.waiting)reg.waiting.postMessage({type:'SKIP_WAITING'});
       reg.addEventListener('updatefound',()=>{
