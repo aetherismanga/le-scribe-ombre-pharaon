@@ -375,7 +375,16 @@ body.immersive-fallback .cover-page img{
 .chapter-link.active{outline:2px solid var(--accent);outline-offset:1px}
 .chapter-link.completed.active{box-shadow:inset 0 0 0 1px rgba(79,116,71,.25)}
 
-#audioDrawer{width:min(330px,88vw)}
+#audioDrawer{width:min(390px,100vw);max-width:100vw;overflow-x:hidden}
+#audioDrawer .drawer-body{overflow-x:hidden;padding:16px}
+#audioDrawer .audio-controls,#audioDrawer .audio-setting,#hdVoiceBox{min-width:0;max-width:100%;box-sizing:border-box}
+#audio-main{min-width:0}
+#voiceGender,#voiceSelect,#speechRate{max-width:100%;box-sizing:border-box}
+#hdVoiceBox .audio-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+#hdVoiceBox .audio-row button{width:100%;min-width:0;padding:8px 6px;font-size:.88rem}
+#hdVoiceRemove{grid-column:1/-1}
+#hdVoiceStatus{overflow-wrap:anywhere;word-break:break-word}
+@media(max-width:480px){#audioDrawer{width:100vw}#audioDrawer .drawer-head{padding:14px 16px}#audioDrawer .drawer-body{padding:12px}.audio-controls{gap:10px}.audio-main{grid-template-columns:1fr 1fr}.audio-note{font-size:.72rem}#hdVoiceBox{padding:10px!important}}
 .audio-controls{display:grid;gap:12px}
 .audio-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .audio-main{display:grid;grid-template-columns:1fr 1fr;gap:8px}
@@ -516,8 +525,8 @@ body.immersive-fallback #fsPrevEdge{display:flex}
       </div>
       <p class="audio-note">Les voix proposées dépendent des voix françaises installées sur votre téléphone. Les voix Natural, Neural, Premium et Google sont privilégiées.</p>
       <div class="setting" id="hdVoiceBox" style="margin-top:6px;padding:12px;border:1px solid var(--border);border-radius:10px;background:var(--panel)">
-        <label style="display:block;margin-bottom:7px">✨ Voix HD locale — bêta</label>
-        <p class="audio-note" style="margin-bottom:9px">Piper fonctionne directement sur votre appareil. Le pack français (~77 Mo) n’est téléchargé qu’à votre demande puis conservé localement.</p>
+        <label style="display:block;margin-bottom:7px">✨ Voix HD — sur l’appareil</label>
+        <p class="audio-note" style="margin-bottom:9px">Téléchargement unique d’environ 77 Mo. Ensuite la voix reste stockée sur votre appareil.</p>
         <div class="audio-row">
           <button type="button" id="hdVoiceInstall">⬇ Installer le pack HD</button>
           <button type="button" id="hdVoiceTest" disabled>▶ Tester HD</button>
@@ -864,13 +873,18 @@ body.immersive-fallback #fsPrevEdge{display:flex}
     hdTts=await import('https://cdn.jsdelivr.net/npm/@mintplex-labs/piper-tts-web@1.0.5/+esm');
     return hdTts;
   }
+  function friendlyHdError(e){
+    const m=String(e&&e.message||e||'');
+    if(/onnx|wasm|backend|dynamically imported|failed to fetch/i.test(m))return 'Le moteur vocal HD n’a pas pu démarrer sur ce téléphone. Le pack est bien installé : correction du moteur nécessaire.';
+    return 'La voix HD n’a pas pu démarrer. Réessayez dans quelques instants.';
+  }
   async function refreshHdVoiceState(){
     try{
       const t=await loadHdTts(),stored=await t.stored(),ok=Array.isArray(stored)&&stored.includes(HD_VOICE_ID);
       $('hdVoiceTest').disabled=!ok;$('hdVoiceRemove').disabled=!ok;
       $('hdVoiceInstall').textContent=ok?'✓ Pack HD installé':'⬇ Installer le pack HD';
       $('hdVoiceStatus').textContent=ok?'Pack HD installé localement — prêt à tester.':'Pack HD non installé (~77 Mo).';
-    }catch(e){$('hdVoiceStatus').textContent='Voix HD indisponible sur ce navigateur : '+(e&&e.message?e.message:'erreur de chargement');}
+    }catch(e){$('hdVoiceStatus').textContent=friendlyHdError(e);}
   }
   $('hdVoiceInstall').addEventListener('click',async()=>{
     const b=$('hdVoiceInstall');b.disabled=true;
@@ -883,7 +897,7 @@ body.immersive-fallback #fsPrevEdge{display:flex}
       });
       $('hdVoiceStatus').textContent='Pack HD installé localement.';
       $('hdVoiceTest').disabled=false;$('hdVoiceRemove').disabled=false;b.textContent='✓ Pack HD installé';
-    }catch(e){$('hdVoiceStatus').textContent='Échec du téléchargement : '+(e&&e.message?e.message:'erreur inconnue');}
+    }catch(e){$('hdVoiceStatus').textContent=friendlyHdError(e);}
     finally{b.disabled=false;}
   });
   $('hdVoiceTest').addEventListener('click',async()=>{
@@ -893,7 +907,7 @@ body.immersive-fallback #fsPrevEdge{display:flex}
       const wav=await t.predict({text:'La nuit tombe sur les rives du Nil. Dans le silence, le scribe reprend son calame.',voiceId:HD_VOICE_ID});
       const u=URL.createObjectURL(wav),a=new Audio(u);a.onended=()=>URL.revokeObjectURL(u);await a.play();
       $('hdVoiceStatus').textContent='Lecture HD locale réussie.';
-    }catch(e){$('hdVoiceStatus').textContent='Test HD impossible : '+(e&&e.message?e.message:'erreur inconnue');}
+    }catch(e){$('hdVoiceStatus').textContent=friendlyHdError(e);}
     finally{b.disabled=false;}
   });
   $('hdVoiceRemove').addEventListener('click',async()=>{
