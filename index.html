@@ -542,6 +542,14 @@ body.immersive-fallback #fsPrevEdge{display:flex}
  .chapter-link strong{font-size:.9rem!important}.chapter-link .chapter-name{font-size:.95rem!important}
 }
 
+
+/* V8 — vrais assets graphiques validés */
+.topbar .icon-btn.ui-approved{background:transparent!important;border:0!important;box-shadow:none!important;padding:0!important;min-width:0!important;min-height:0!important;border-radius:0!important;overflow:visible;display:flex;align-items:center;justify-content:center}
+.topbar .icon-btn.ui-approved::before,.topbar .icon-btn.ui-approved::after{display:none!important}
+.topbar .icon-btn.ui-approved img{display:block;width:clamp(92px,10.6vw,150px);height:auto;max-height:66px;object-fit:contain;filter:none;transition:transform .12s ease,filter .12s ease}
+.topbar .icon-btn.ui-approved:hover img,.topbar .icon-btn.ui-approved:focus-visible img{transform:translateY(-1px);filter:brightness(1.12) drop-shadow(0 0 7px rgba(240,183,63,.35))}
+.topbar .icon-btn.ui-approved:active img{transform:scale(.97)}
+@media(max-width:720px){.topbar .icon-btn.ui-approved{min-height:0!important;padding:0!important}.topbar .icon-btn.ui-approved img{width:clamp(62px,18.2vw,105px);max-height:58px}.topbar .actions{gap:2px!important}}
 </style>
 </head>
 <body class="theme-ivory">
@@ -549,12 +557,12 @@ body.immersive-fallback #fsPrevEdge{display:flex}
   <header class="topbar">
     <div class="brand">Le Scribe et l’Ombre de Pharaon</div>
     <div class="actions">
-      <button class="icon-btn" id="chaptersBtn" aria-label="Chapitres"><svg class="ui-icon"><use href="ui-assets.svg#book"/></svg><span>Chapitres</span></button>
-      <button class="icon-btn" id="lexiconBtn" aria-label="Lexique"><svg class="ui-icon"><use href="ui-assets.svg#eye"/></svg><span>Lexique</span></button>
+      <button class="icon-btn ui-approved" id="chaptersBtn" aria-label="Chapitres"><img src="images/ui-chapitres.png" alt="Chapitres"></button>
+      <button class="icon-btn ui-approved" id="lexiconBtn" aria-label="Lexique"><img src="images/ui-lexique.png" alt="Lexique"></button>
       <button class="icon-btn" id="installBtn" aria-label="Installer l’application" title="Installer l’application"><span class="ui-aa">↓</span><span class="install-label">Installer</span></button>
-      <button class="icon-btn" id="audioBtn" aria-label="Lecture vocale" title="Lecture vocale"><svg class="ui-icon"><use href="ui-assets.svg#speaker"/></svg><span class="audio-label">Lecture</span></button>
-      <button class="icon-btn" id="fullscreenBtn" aria-label="Plein écran" title="Plein écran"><svg class="ui-icon"><use href="ui-assets.svg#fullscreen"/></svg><span class="fs-label">Plein écran</span></button>
-      <button class="icon-btn" id="settingsBtn" aria-label="Réglages"><span class="ui-aa">Aa</span><span>Options</span></button>
+      <button class="icon-btn ui-approved" id="audioBtn" aria-label="Lecture vocale" title="Lecture vocale"><img src="images/ui-lecture.png" alt="Lecture"></button>
+      <button class="icon-btn ui-approved" id="fullscreenBtn" aria-label="Plein écran" title="Plein écran"><img src="images/ui-plein-ecran.png" alt="Plein écran"></button>
+      <button class="icon-btn ui-approved" id="settingsBtn" aria-label="Réglages"><img src="images/ui-options.png" alt="Options"></button>
     </div>
   </header>
 
@@ -938,7 +946,7 @@ body.immersive-fallback #fsPrevEdge{display:flex}
 
   function nativeFullscreenElement(){return document.fullscreenElement||document.webkitFullscreenElement||null;}
   function fullscreenActive(){return !!nativeFullscreenElement()||immersiveFallback;}
-  function updateFullscreenButton(){const active=fullscreenActive(),btn=$('fullscreenBtn');updateMusicUI();btn.innerHTML=active?'✕ <span class="fs-label">Quitter</span>':'⛶ <span class="fs-label">Plein écran</span>';btn.setAttribute('aria-label',active?'Quitter le plein écran':'Plein écran');btn.title=active?'Quitter le plein écran':'Plein écran';}
+  function updateFullscreenButton(){const active=fullscreenActive(),btn=$('fullscreenBtn');updateMusicUI();btn.innerHTML=active?'✕ <span class="fs-label">Quitter</span>':'<img src="images/ui-plein-ecran.png" alt="Plein écran">';btn.setAttribute('aria-label',active?'Quitter le plein écran':'Plein écran');btn.title=active?'Quitter le plein écran':'Plein écran';}
   async function enterNativeFullscreen(){const t=document.documentElement;if(t.requestFullscreen){try{await t.requestFullscreen({navigationUI:'hide'});}catch(_){await t.requestFullscreen();}return true;}if(t.webkitRequestFullscreen){t.webkitRequestFullscreen();return true;}return false;}
   async function exitNativeFullscreen(){if(document.exitFullscreen){await document.exitFullscreen();return true;}if(document.webkitExitFullscreen){document.webkitExitFullscreen();return true;}return false;}
   let fullscreenReflowTimer=null,fullscreenAnchor='';
@@ -1018,7 +1026,7 @@ body.immersive-fallback #fsPrevEdge{display:flex}
       swReloaded=true;
       location.reload();
     });
-    navigator.serviceWorker.register('sw.js?v=20261003-ui3',{updateViaCache:'none'}).then(reg=>{
+    navigator.serviceWorker.register('sw.js?v=20261003-ui4',{updateViaCache:'none'}).then(reg=>{
       reg.update().catch(()=>{});
       if(reg.waiting)reg.waiting.postMessage({type:'SKIP_WAITING'});
       reg.addEventListener('updatefound',()=>{
