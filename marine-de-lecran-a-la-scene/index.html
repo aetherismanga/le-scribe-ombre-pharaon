@@ -1,0 +1,1552 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1a1720">
+<meta name="description" content="Marine, de l’écran à la scène — un récit de fan entre télévision, concerts et souvenirs.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.svg">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Marine, de l’écran à la scène</title>
+<style>
+:root{
+  --bg:#efe1c9;--paper:#fffaf1;--ink:#241c1d;--muted:#75686b;--border:#d7c3aa;
+  --dark:#17151d;--gold:#c9a45d;--rose:#b45e70;--panel:#f6ecde;
+  --reader-size:19px;--reader-line:1.72;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:Georgia,"Times New Roman",serif}
+body.theme-white{--paper:#fff;--panel:#f5f5f5;--bg:#e8e8e8;--ink:#181818;--border:#d5d5d5}
+body.theme-ivory{--paper:#fff8e9;--panel:#f4ead7;--bg:#e2d2b7;--ink:#241d18;--border:#d5c2a2}
+button,input{font:inherit}
+button{cursor:pointer}
+.app{height:100%;display:flex;flex-direction:column;overflow:hidden}
+.topbar{flex:0 0 auto;display:flex;align-items:center;gap:8px;justify-content:space-between;padding:8px 10px;background:rgba(23,21,29,.97);color:#fff;backdrop-filter:blur(9px);z-index:10}
+.brand{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:38vw}
+.actions{display:flex;gap:6px;align-items:center;flex-wrap:nowrap}
+.icon-btn{min-width:43px;min-height:43px;border-radius:12px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#fff;padding:8px 11px}
+.icon-btn:hover{background:rgba(255,255,255,.14)}
+.stage{flex:1 1 auto;min-height:0;padding:8px;display:flex;flex-direction:column;overflow:hidden}
+.book-shell{flex:1 1 auto;min-height:0;width:100%;max-width:820px;margin:0 auto;display:flex}
+.page{position:relative;flex:1 1 auto;min-height:0;background:var(--paper);border:1px solid var(--border);border-radius:5px;box-shadow:0 14px 32px rgba(32,22,23,.18);overflow:hidden}
+.cover-page{padding:0;background:#111;display:flex;align-items:center;justify-content:center}
+.cover-page img{width:100%;height:100%;display:block;object-fit:contain;background:#111}
+.reader-page{padding:0;display:none}
+.flow-viewport{width:100%;height:100%;overflow:hidden}
+.flow-content{
+  height:100%;width:100%;column-width:calc(100vw - 58px);column-gap:0;column-fill:auto;
+  padding:34px clamp(24px,7vw,70px) 38px;
+  font-size:var(--reader-size);line-height:var(--reader-line);text-align:justify;hyphens:auto;
+}
+.chapter{break-before:column;column-break-before:always}
+.chapter:first-child{break-before:auto;column-break-before:auto}
+.chapter-head{text-align:center;break-after:avoid;margin:0 0 30px}
+.chapter-kicker{font-size:.76rem;letter-spacing:.16em;text-transform:uppercase;color:var(--rose);font-weight:700;margin-bottom:7px}
+.chapter h1{font-size:clamp(1.6rem,5vw,2.35rem);line-height:1.12;margin:0;color:#2d2225}
+.chapter p{margin:0 0 1.04em;text-indent:1.25em;break-inside:auto}
+.chapter p.first-para{text-indent:0}
+.chapter p.first-para:first-letter{float:left;font-size:3.2em;line-height:.8;padding-right:.08em;color:var(--gold)}
+.chapter p.dialogue{text-indent:0}
+.nav{flex:0 0 auto;max-width:820px;width:100%;margin:7px auto 0;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px}
+.nav button{border:1px solid var(--border);background:var(--paper);color:var(--ink);border-radius:12px;padding:9px 13px;min-height:42px}
+.nav .next{justify-self:end}
+.nav .counter{font-size:.9rem;color:#51474a;text-align:center;min-width:95px}
+.progress-wrap{flex:0 0 auto;max-width:820px;width:100%;margin:5px auto 0}
+.progress{height:4px;background:rgba(0,0,0,.12);border-radius:99px;overflow:hidden}
+.progress span{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--gold),var(--rose))}
+.progress-label{font-size:11px;color:#655b5d;display:flex;justify-content:space-between;margin-top:3px}
+.drawer-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:40;display:none}
+.drawer-backdrop.open{display:block}
+.drawer{position:fixed;top:0;bottom:0;left:0;width:min(390px,92vw);background:var(--paper);z-index:50;transform:translateX(-105%);transition:.2s;overflow:auto;box-shadow:10px 0 30px rgba(0,0,0,.28)}
+.drawer.open{transform:none}
+.drawer-head{position:sticky;top:0;background:var(--paper);display:flex;justify-content:space-between;align-items:center;padding:16px;border-bottom:1px solid var(--border);z-index:2}
+.drawer-head h2{margin:0;font-size:1.2rem}
+.close-btn{border:0;background:transparent;font-size:1.5rem;min-width:44px;min-height:44px;color:var(--ink)}
+.drawer-body{padding:14px 16px 24px}
+.chapter-list{display:grid;gap:7px}
+.chapter-link{text-align:left;border:1px solid var(--border);background:var(--panel);color:var(--ink);padding:11px 12px;border-radius:10px}
+.chapter-link.active{outline:2px solid var(--rose);background:var(--paper)}
+.setting{margin-bottom:16px}
+.setting label{display:block;font-weight:700;margin-bottom:7px}
+.theme-choice{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.theme-choice button{padding:12px;border-radius:10px;border:2px solid var(--border)}
+.theme-choice .selected{outline:3px solid var(--rose)}
+.range-row{display:flex;gap:10px;align-items:center}
+.range-row input{width:100%}
+.audio-actions{display:grid;gap:8px}
+.audio-actions button{padding:12px;border-radius:10px;border:1px solid var(--border);background:var(--panel);color:var(--ink)}
+.audio-status{font-size:.88rem;color:var(--muted);line-height:1.4;margin:10px 0}
+.badge{display:inline-block;border:1px solid var(--border);background:var(--panel);border-radius:999px;padding:5px 9px;font-size:.78rem;color:var(--muted)}
+.toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:#211d24;color:#fff;padding:10px 14px;border-radius:999px;z-index:90;opacity:0;pointer-events:none;transition:.2s}
+.toast.show{opacity:1}
+.fs-exit{display:none;position:fixed;right:max(8px,env(safe-area-inset-right));top:max(8px,env(safe-area-inset-top));z-index:100;width:40px;height:40px;border-radius:50%;border:1px solid rgba(255,255,255,.35);background:rgba(20,17,22,.48);color:#fff;font-size:20px}
+html:fullscreen .topbar,html:fullscreen .nav,html:fullscreen .progress-wrap,html:fullscreen .drawer,html:fullscreen .drawer-backdrop{display:none!important}
+html:fullscreen .stage{padding:0;height:100%}
+html:fullscreen .book-shell{max-width:none;height:100%}
+html:fullscreen .page{border:0;border-radius:0;box-shadow:none}
+html:fullscreen .fs-exit{display:block}
+html:fullscreen .flow-content{padding:max(32px,env(safe-area-inset-top)) clamp(24px,7vw,82px) max(30px,env(safe-area-inset-bottom));column-width:100vw}
+html:fullscreen .cover-page img{object-fit:contain}
+body.immersive .topbar,body.immersive .nav,body.immersive .progress-wrap,body.immersive .drawer,body.immersive .drawer-backdrop{display:none!important}
+body.immersive .stage{padding:0;height:100%}
+body.immersive .book-shell{max-width:none;height:100%}
+body.immersive .page{border:0;border-radius:0;box-shadow:none}
+body.immersive .fs-exit{display:block}
+body.immersive .flow-content{padding:max(32px,env(safe-area-inset-top)) clamp(24px,7vw,82px) max(30px,env(safe-area-inset-bottom));column-width:100vw}
+@media(max-width:640px){
+  .brand{max-width:27vw;font-size:.82rem}
+  .topbar{padding:6px 7px}
+  .icon-btn{min-width:40px;min-height:40px;padding:7px 9px}
+  .stage{padding:5px}
+  .flow-content{padding:24px 20px 30px;column-width:calc(100vw - 42px);text-align:left}
+  .chapter-head{margin-bottom:20px}
+  .chapter h1{font-size:clamp(1.35rem,6vw,1.8rem)}
+  .nav{margin-top:4px}
+  .nav button{min-height:38px;padding:7px 9px;font-size:.84rem}
+  .progress-wrap{margin-top:3px}
+}
+@media(prefers-reduced-motion:reduce){.drawer,.toast{transition:none}}
+</style>
+</head>
+<body class="theme-ivory">
+<div class="app" id="app" tabindex="0">
+  <header class="topbar">
+    <div class="brand">Marine — De l’écran à la scène</div>
+    <div class="actions">
+      <button class="icon-btn" id="chaptersBtn" aria-label="Chapitres" title="Chapitres">☰</button>
+      <button class="icon-btn" id="audioBtn" aria-label="Lecture audio" title="Lecture audio">🔊</button>
+      <button class="icon-btn" id="fullscreenBtn" aria-label="Plein écran" title="Plein écran">⛶</button>
+      <button class="icon-btn" id="settingsBtn" aria-label="Réglages" title="Réglages">Aa</button>
+    </div>
+  </header>
+
+  <main class="stage">
+    <div class="book-shell">
+      <article class="page cover-page" id="coverPage"><img src="cover.jpg" alt="Couverture du livre Marine, de l’écran à la scène"></article>
+      <article class="page reader-page" id="readerPage">
+        <div class="flow-viewport" id="flowViewport">
+          <div class="flow-content" id="flowContent">
+            <section class="chapter" id="sec-0" data-section="0">
+<div class="chapter-head">
+<h1>NOTE AU LECTEUR</h1></div>
+<p id="p-0-0" class="first-para">Ce livre n&#x27;est pas une biographie officielle de Marine Delplace. Il n&#x27;a pas été écrit avec elle, ni en son nom. Il raconte une histoire plus modeste et, à mes yeux, plus étrange : celle d&#x27;un téléspectateur ordinaire qui, après plus de vingt ans passés devant la Star Academy sans jamais se considérer comme un fan absolu, s&#x27;est laissé surprendre par une voix.</p>
+<p id="p-0-1" class="">Les éléments concernant le parcours public de Marine ont été reconstruits à partir d&#x27;émissions, d&#x27;interviews, de publications et de sources accessibles au public. Les souvenirs qui me concernent sont racontés avec la liberté d&#x27;un récit : une sensation peut être condensée, une soirée résumée, une pensée reformulée après coup. Je n&#x27;ai pas cherché à inventer une intimité avec Marine que je n&#x27;ai pas. Je n&#x27;ai pas davantage voulu parler à sa place.</p>
+<p id="p-0-2" class="">Ce qui suit est donc un livre de fan, au sens le plus simple du terme. Un livre sur ce moment curieux où l&#x27;on croit regarder une émission comme toutes les autres et où, sans prévenir, une artiste finit par entrer dans votre quotidien.</p>
+<p id="p-0-3" class="">Et tout commence, comme souvent avec les histoires qu&#x27;on n&#x27;avait pas prévues, par une phrase assez ridicule :</p>
+<p id="p-0-4" class="">Je n&#x27;avais absolument aucune intention de devenir fan de Marine.</p>
+</section>
+<section class="chapter" id="sec-1" data-section="1">
+<div class="chapter-head">
+<div class="chapter-kicker">PROLOGUE</div>
+<h1>JE N&#x27;AVAIS PAS PRÉVU DE DEVENIR FAN</h1></div>
+<p id="p-1-0" class="first-para">À quarante-cinq ans, on pense avoir dépassé l&#x27;âge des emballements de téléspectateur.</p>
+<p id="p-1-1" class="">Enfin, c&#x27;est ce qu&#x27;on se raconte.</p>
+<p id="p-1-2" class="">On a un travail, des habitudes, des factures, des rendez-vous, des journées qui passent beaucoup trop vite et des soirées qui commencent parfois avec une télécommande dans une main et l&#x27;envie de ne surtout pas réfléchir dans l&#x27;autre. On regarde une émission, on commente deux ou trois prestations, on dit qu&#x27;untel chante bien, qu&#x27;un autre nous touche moins, puis on va se coucher. Le lendemain, la vie reprend.</p>
+<p id="p-1-3" class="">C&#x27;est comme ça que j&#x27;ai toujours regardé la Star Academy.</p>
+<p id="p-1-4" class="">Depuis la première saison.</p>
+<p id="p-1-5" class="">Je pourrais presque mesurer ma vie à travers les différentes époques du château. J&#x27;avais vingt ans quand Jenifer est apparue sur TF1. À l&#x27;époque, la télévision avait encore ce pouvoir étrange de fabriquer des rendez-vous collectifs. On ne regardait pas un programme quand on voulait : on était là quand il commençait. Le lendemain, on en parlait. Les chansons du prime continuaient dans les voitures, au travail, dans les cafés. Les candidats devenaient, pendant quelques semaines, des gens que l&#x27;on avait l&#x27;impression de connaître un peu.</p>
+<p id="p-1-6" class="">J&#x27;ai aimé la Star Academy. Beaucoup, même. Mais pendant toutes ces années, je suis resté ce que j&#x27;appellerais un spectateur normal.</p>
+<p id="p-1-7" class="">J&#x27;avais mes préférences. Bien sûr que Jenifer m&#x27;a marqué. Comment aurait-il pu en être autrement ? Elle était la première. Elle reste attachée à cette sensation de découverte, à l&#x27;époque où personne ne savait encore ce que l&#x27;émission allait devenir.</p>
+<p id="p-1-8" class="">Puis il y a eu Grégory Lemarchal.</p>
+<p id="p-1-9" class="">Là, c&#x27;était différent.</p>
+<p id="p-1-10" class="">Je reviendrai sur lui, parce qu&#x27;il mérite plus qu&#x27;une ligne dans un souvenir. Sa voix, son courage, sa façon d&#x27;être sur scène ont créé quelque chose de particulier chez énormément de gens, et j&#x27;en fais partie. Sa disparition a aussi laissé une trace qui dépasse largement une émission de télévision.</p>
+<p id="p-1-11" class="">Mais même avec Grégory, je n&#x27;étais pas devenu ce que je suis devenu plus tard avec Marine.</p>
+<p id="p-1-12" class="">Je regardais. J&#x27;admirais. J&#x27;étais ému. Puis je reprenais ma vie.</p>
+<p id="p-1-13" class="">Les saisons passaient. Certaines me plaisaient davantage que d&#x27;autres. Certains candidats me semblaient évidents, d&#x27;autres moins. Quand la Star Academy a disparu de TF1, je n&#x27;ai pas couru après elle. L&#x27;édition diffusée ailleurs ne m&#x27;a pas attiré. Pour moi, la Star Ac, c&#x27;était TF1, Nikos, le château et cette drôle de sensation du samedi soir.</p>
+<p id="p-1-14" class="">Quand elle est revenue en 2022, j&#x27;étais content. Comme beaucoup de téléspectateurs qui avaient grandi avec elle, j&#x27;ai retrouvé quelque chose de familier. Anisha a gagné. L&#x27;année suivante, Pierre Garnier s&#x27;est imposé face à Julien. J&#x27;ai aimé la saison, j&#x27;ai apprécié Pierre, Helena et d&#x27;autres candidats. J&#x27;ai regardé avec plaisir.</p>
+<p id="p-1-15" class="">Mais je n&#x27;étais toujours pas accroché.</p>
+<p id="p-1-16" class="">J&#x27;aimais l&#x27;émission. Pas une personne en particulier.</p>
+<p id="p-1-17" class="">Et puis la saison suivante a commencé.</p>
+<p id="p-1-18" class="">Je n&#x27;avais aucune raison de penser que celle-là serait différente.</p>
+<p id="p-1-19" class="">Au début, elle ne l&#x27;était pas.</p>
+<p id="p-1-20" class="">Un château, des jeunes artistes, des professeurs, des évaluations, des primes, les mêmes discussions sur les réseaux : qui chante le mieux, qui mérite d&#x27;être là, qui va sortir, qui pourrait gagner. Le grand manège habituel se remettait en route.</p>
+<p id="p-1-21" class="">Et parmi les candidats, il y avait cette jeune femme du Nord, petite par la taille, immense dès qu&#x27;elle ouvrait la bouche, avec un humour capable d&#x27;arriver juste au moment où l&#x27;on s&#x27;attendait à une grande déclaration sérieuse.</p>
+<p id="p-1-22" class="">Marine.</p>
+<p id="p-1-23" class="">Je voudrais pouvoir écrire qu&#x27;à la première seconde j&#x27;ai su.</p>
+<p id="p-1-24" class="">Ce serait joli.</p>
+<p id="p-1-25" class="">Ce serait faux.</p>
+<p id="p-1-26" class="">Les choses importantes ne se présentent pas toujours avec un panneau lumineux « Attention, souvenir fondateur ». Parfois, elles commencent de manière beaucoup plus banale. Une voix retient l&#x27;attention. Une interprétation donne envie de réécouter. Une personnalité fait sourire. Puis on se surprend à attendre la prestation suivante.</p>
+<p id="p-1-27" class="">Et un jour, sans savoir à quel moment exact on a franchi la ligne, on n&#x27;est plus seulement en train de regarder.</p>
+<p id="p-1-28" class="">On suit.</p>
+<p id="p-1-29" class="">Puis on espère.</p>
+<p id="p-1-30" class="">Puis on défend.</p>
+<p id="p-1-31" class="">Puis on crée.</p>
+<p id="p-1-32" class="">Dans mon cas, ça a pris une forme un peu particulière parce que, sur Internet, je ne suis pas seulement Jérôme devant sa télévision.</p>
+<p id="p-1-33" class="">Je suis aussi Le Grognard du Net.</p>
+<p id="p-1-34" class="">Le pseudo était déjà là. La chaîne existait déjà. Elle n&#x27;avait pas été créée pour Marine. Je parlais de ce qui m&#x27;amusait, de ce qui m&#x27;intéressait, de Star Academy, de musique, de télévision, de culture populaire. Je bricolais des formats, des shorts, des vidéos plus longues. Je testais. Je publiais. Comme beaucoup de créateurs, je regardais les statistiques en faisant semblant de ne pas trop les regarder.</p>
+<p id="p-1-35" class="">Puis Marine a commencé à prendre de la place.</p>
+<p id="p-1-36" class="">D&#x27;abord dans mes vidéos.</p>
+<p id="p-1-37" class="">Puis dans mes idées.</p>
+<p id="p-1-38" class="">Puis dans mes chansons.</p>
+<p id="p-1-39" class="">Puis sur mon site.</p>
+<p id="p-1-40" class="">Et, forcément, dans ce livre.</p>
+<p id="p-1-41" class="">Je n&#x27;ai jamais voulu devenir le fan qui sait tout, qui juge tout, qui pense posséder une artiste parce qu&#x27;il a regardé cent vidéos d&#x27;elle. Au contraire. Plus je la suivais, plus une règle me paraissait importante : rester à ma place.</p>
+<p id="p-1-42" class="">Je pouvais aimer sa voix sans prétendre la connaître.</p>
+<p id="p-1-43" class="">Je pouvais raconter son parcours sans raconter sa vie privée.</p>
+<p id="p-1-44" class="">Je pouvais créer des chansons inspirées par l&#x27;énergie qu&#x27;elle dégageait sans copier sa voix et sans faire croire une seconde qu&#x27;elle les avait chantées.</p>
+<p id="p-1-45" class="">Je pouvais être enthousiaste sans devenir envahissant.</p>
+<p id="p-1-46" class="">En résumé, je pouvais être fan et rester respectueux.</p>
+<p id="p-1-47" class="">Ce mot-là compte beaucoup pour moi.</p>
+<p id="p-1-48" class="">Parce qu&#x27;au fond, ce livre n&#x27;est pas l&#x27;histoire d&#x27;une obsession. C&#x27;est l&#x27;histoire d&#x27;une admiration inattendue.</p>
+<p id="p-1-49" class="">L&#x27;histoire d&#x27;un type qui avait regardé la Star Academy pendant plus de vingt ans et qui pensait connaître le programme par cœur.</p>
+<p id="p-1-50" class="">Jusqu&#x27;au jour où une fille appelée Marine s&#x27;est mise à chanter.</p>
+<p id="p-1-51" class="">Et merde.</p>
+<p id="p-1-52" class="">Le Grognard venait de trouver quelqu&#x27;un à qui il n&#x27;avait absolument pas prévu de s&#x27;attacher.</p>
+<p id="p-1-53" class="">Le plus étonnant, c&#x27;est que je n&#x27;ai pas compris immédiatement que tout cela méritait un livre.</p>
+<p id="p-1-54" class="">Pendant longtemps, je pensais en vidéos. Une idée devait tenir dans un titre, une miniature, quelques minutes. Même lorsqu&#x27;un sujet me touchait vraiment, je réfléchissais en images et en rythme de montage.</p>
+<p id="p-1-55" class="">Puis une évidence s&#x27;est imposée : il manquait quelque chose entre toutes ces vidéos.</p>
+<p id="p-1-56" class="">Le lien.</p>
+<p id="p-1-57" class="">Ce qui expliquait pourquoi cette candidate-là avait pris plus de place que les autres. Pourquoi, après des années à regarder la même émission avec plaisir mais sans dépendance particulière, je m&#x27;étais mis à suivre une carrière au-delà du samedi soir. Pourquoi j&#x27;avais écrit des chansons de fan, organisé des pages sur mon site, préparé des hommages, attendu un concert.</p>
+<p id="p-1-58" class="">Une vidéo pouvait raconter un événement.</p>
+<p id="p-1-59" class="">Un livre pouvait raconter la transformation.</p>
+<p id="p-1-60" class="">Alors j&#x27;ai décidé de partir de moi, même si ce n&#x27;est pas toujours l&#x27;exercice le plus confortable. Parler de Marine sans parler du fan n&#x27;aurait aucun sens ici. Il fallait assumer les quarante-cinq ans, les souvenirs de 2001, Grégory, les saisons suivies sans passion excessive, les heures de montage, les commentaires, les moments où je me suis surpris moi-même à défendre une chanson comme si j&#x27;avais participé à l&#x27;enregistrement.</p>
+<p id="p-1-61" class="">Ce livre n&#x27;est donc pas seulement « sur Marine ».</p>
+<p id="p-1-62" class="">Il est sur ce qu&#x27;une artiste peut déclencher chez quelqu&#x27;un qui ne s&#x27;y attendait plus vraiment.</p>
+</section>
+<section class="chapter" id="sec-2" data-section="2">
+<div class="chapter-head">
+<div class="chapter-kicker">CHAPITRE 1</div>
+<h1>AVANT MARINE, IL Y AVAIT DÉJÀ LE CHÂTEAU</h1></div>
+<p id="p-2-0" class="first-para">Pour comprendre ce qui m&#x27;est arrivé avec Marine, il faut remonter bien avant elle.</p>
+<p id="p-2-1" class="">Octobre 2001.</p>
+<p id="p-2-2" class="">La Star Academy arrive sur TF1. Jenifer n&#x27;est pas encore « Jenifer » comme on la connaît aujourd&#x27;hui. Nikos Aliagas débute dans ce rôle qui finira par lui coller à la peau. Le château n&#x27;est pas encore un monument de la télévision populaire française. C&#x27;est une nouveauté.</p>
+<p id="p-2-3" class="">Moi, j&#x27;ai vingt ans.</p>
+<p id="p-2-4" class="">Vingt ans, c&#x27;est l&#x27;âge où l&#x27;on est persuadé d&#x27;être déjà adulte tout en ayant encore suffisamment d&#x27;insouciance pour organiser une soirée autour d&#x27;un programme télé. À l&#x27;époque, la mécanique paraît énorme : des jeunes enfermés dans un château, des cours, des évaluations, une élimination, puis ces grands primes où des artistes confirmés viennent chanter avec eux.</p>
+<p id="p-2-5" class="">On peut sourire aujourd&#x27;hui du mot « événement », parce que nous vivons entourés de contenus disponibles en permanence. Mais en 2001, une finale regardée par plus de onze millions de personnes n&#x27;est pas juste un programme populaire. C&#x27;est un morceau de culture commune.</p>
+<p id="p-2-6" class="">Jenifer gagne cette première saison.</p>
+<p id="p-2-7" class="">Je l&#x27;aime beaucoup. Sa fraîcheur, sa voix, son énergie. Il y avait quelque chose de spontané chez elle. Et, surtout, elle représentait le commencement. Même vingt-cinq ans plus tard, quand je repense aux premières saisons, son prénom arrive avant tous les autres.</p>
+<p id="p-2-8" class="">Ensuite viennent Nolwenn Leroy, Élodie Frégé, puis Grégory Lemarchal. Après lui, Magalie Vaé, Cyril Cinélu, Quentin Mosimann, Mickels Réa. Des voix différentes, des parcours différents, des carrières très différentes elles aussi.</p>
+<p id="p-2-9" class="">Je ne vais pas réécrire ici toute l&#x27;histoire de la Star Academy. Ce n&#x27;est pas le sujet. Ce qui m&#x27;intéresse, c&#x27;est ce que ces années ont créé chez moi : une habitude de téléspectateur.</p>
+<p id="p-2-10" class="">Je regardais les candidats arriver et je savais déjà, sans y penser, comment les choses allaient se dérouler.</p>
+<p id="p-2-11" class="">Il y aurait le candidat impressionnant dès le premier soir.</p>
+<p id="p-2-12" class="">Celui qui progresserait.</p>
+<p id="p-2-13" class="">Celui qu&#x27;on trouverait injustement nommé.</p>
+<p id="p-2-14" class="">Celui qui deviendrait plus populaire pour ses blagues que pour ses évaluations.</p>
+<p id="p-2-15" class="">Il y aurait les professeurs sévères, les larmes après les débriefs, les lettres, les surprises, les parents qui apparaissent sur un écran au pire moment possible pour les nerfs de tout le monde.</p>
+<p id="p-2-16" class="">Et puis le public choisirait.</p>
+<p id="p-2-17" class="">La Star Academy a cette particularité : elle mélange la musique et l&#x27;attachement. On ne vote pas seulement pour la meilleure note tenue le plus longtemps. On vote aussi pour une personnalité, une progression, une fragilité, une manière d&#x27;être dans un groupe.</p>
+<p id="p-2-18" class="">Pendant des années, j&#x27;ai compris cette mécanique sans jamais tomber complètement dedans.</p>
+<p id="p-2-19" class="">Je pouvais dire : « Lui, je l&#x27;aime bien. »</p>
+<p id="p-2-20" class="">Ou : « Elle, elle a quelque chose. »</p>
+<p id="p-2-21" class="">Mais le dimanche suivant, je ne passais pas trois heures à chercher une vidéo, une interview, un extrait de quotidienne ou une ancienne chanson enregistrée avant l&#x27;émission.</p>
+<p id="p-2-22" class="">Je ne créais pas de contenu autour d&#x27;un candidat.</p>
+<p id="p-2-23" class="">Je ne me demandais pas comment raconter son parcours.</p>
+<p id="p-2-24" class="">Je ne me retrouvais pas à réfléchir à un titre de vidéo en conduisant.</p>
+<p id="p-2-25" class="">Surtout, je n&#x27;avais jamais ressenti cette envie très particulière de voir quelqu&#x27;un réussir après l&#x27;émission, longtemps après que les lumières du prime se soient éteintes.</p>
+<p id="p-2-26" class="">C&#x27;est une différence importante.</p>
+<p id="p-2-27" class="">Un téléspectateur veut savoir qui gagne.</p>
+<p id="p-2-28" class="">Un fan veut savoir ce qui vient après.</p>
+<p id="p-2-29" class="">Pendant les premières saisons, je suis resté du premier côté de la frontière.</p>
+<p id="p-2-30" class="">Même lorsque certains artistes continuaient leur carrière avec succès, je les suivais comme n&#x27;importe quel amateur de musique. Jenifer sortait un album ? J&#x27;écoutais. Nolwenn chantait quelque chose qui me plaisait ? Très bien. Quentin Mosimann poursuivait une route complètement différente ? Tant mieux.</p>
+<p id="p-2-31" class="">Mais ma vie n&#x27;était pas organisée autour de leurs sorties.</p>
+<p id="p-2-32" class="">La disparition de l&#x27;émission sur TF1 a d&#x27;ailleurs prouvé à quel point mon attachement était lié au rendez-vous lui-même. Quand une nouvelle version est apparue sur NRJ 12 quelques années plus tard, je ne l&#x27;ai pas suivie. Ce n&#x27;était pas un boycott, encore moins un jugement. Simplement, quelque chose manquait.</p>
+<p id="p-2-33" class="">Pour moi, la Star Academy était liée à une époque, une chaîne, une voix de présentateur, un château.</p>
+<p id="p-2-34" class="">Je pensais que l&#x27;histoire était terminée.</p>
+<p id="p-2-35" class="">Et puis les années ont passé.</p>
+<p id="p-2-36" class="">La télévision a changé. Nous aussi. Les réseaux sociaux sont devenus une scène parallèle. Les candidats n&#x27;étaient plus seulement jugés le samedi soir : on commentait leurs moindres gestes presque en direct. Les extraits circulaient partout. Une performance pouvait vivre dix vies sur TikTok, YouTube, Instagram et les plateformes de streaming.</p>
+<p id="p-2-37" class="">Quand TF1 a annoncé le retour de la Star Academy en 2022, j&#x27;ai eu cette réaction typique des gens qui prennent de l&#x27;âge :</p>
+<p id="p-2-38" class="">« Ah, ça, c&#x27;était quelque chose à notre époque. »</p>
+<p id="p-2-39" class="">Phrase dangereuse. Elle vous transforme immédiatement en ancien combattant du samedi soir.</p>
+<p id="p-2-40" class="">Mais j&#x27;ai regardé.</p>
+<p id="p-2-41" class="">Évidemment que j&#x27;ai regardé.</p>
+<p id="p-2-42" class="">J&#x27;ai retrouvé le château. Nikos. Le générique. Les évaluations. Les jeunes artistes qui entraient avec des rêves beaucoup trop grands pour tenir dans leurs valises.</p>
+<p id="p-2-43" class="">Anisha a remporté cette saison du retour.</p>
+<p id="p-2-44" class="">Puis, en 2023, une nouvelle promotion est arrivée. Pierre Garnier s&#x27;est imposé, avec ce timbre immédiatement reconnaissable. Julien a atteint la finale. Helena s&#x27;est fait une place dans le cœur du public et a construit ensuite une carrière qui a confirmé qu&#x27;on n&#x27;a pas besoin de gagner pour laisser une empreinte.</p>
+<p id="p-2-45" class="">J&#x27;ai aimé cette saison.</p>
+<p id="p-2-46" class="">Vraiment.</p>
+<p id="p-2-47" class="">Mais il y avait encore une distance confortable entre l&#x27;écran et moi.</p>
+<p id="p-2-48" class="">Je regardais Pierre devenir Pierre Garnier. Je comprenais l&#x27;engouement. Je trouvais certaines prestations excellentes.</p>
+<p id="p-2-49" class="">Et pourtant, une fois le programme terminé, je redevenais très vite moi-même.</p>
+<p id="p-2-50" class="">Le Grognard n&#x27;était pas encore devenu fan.</p>
+<p id="p-2-51" class="">Il ne savait simplement pas qu&#x27;il lui restait une saison avant de perdre toute crédibilité sur ce point.</p>
+</section>
+<section class="chapter" id="sec-3" data-section="3">
+<div class="chapter-head">
+<div class="chapter-kicker">CHAPITRE 2</div>
+<h1>GRÉGORY, LE PREMIER CHOC</h1></div>
+<p id="p-3-0" class="first-para">Il y a cependant une exception dans mon histoire de téléspectateur raisonnable.</p>
+<p id="p-3-1" class="">Grégory Lemarchal.</p>
+<p id="p-3-2" class="">On ne peut pas parler de mon rapport à la Star Academy sans parler de lui, parce qu&#x27;il a été le premier à me faire comprendre qu&#x27;une voix pouvait dépasser le cadre de l&#x27;émission.</p>
+<p id="p-3-3" class="">Il arrive à la Star Academy en 2004.</p>
+<p id="p-3-4" class="">Sa maladie est connue. Sa mucoviscidose fait partie de son histoire, mais très vite, ce n&#x27;est pas elle qui prend toute la place. Il chante. Et lorsqu&#x27;il chante, on oublie le reste.</p>
+<p id="p-3-5" class="">C&#x27;est sans doute la première fois que j&#x27;ai ressenti cette chose étrange : le silence intérieur qui arrive lorsque quelqu&#x27;un commence une chanson et que, pendant quelques minutes, on n&#x27;a plus envie de commenter.</p>
+<p id="p-3-6" class="">Grégory possédait cette puissance-là.</p>
+<p id="p-3-7" class="">Sa victoire avait quelque chose d&#x27;évident pour beaucoup de téléspectateurs. Pourtant, ce qui est resté avec le temps n&#x27;est pas un pourcentage de votes, une finale ou un trophée. C&#x27;est une présence.</p>
+<p id="p-3-8" class="">Quand il est mort en 2007, à seulement vingt-trois ans, la Star Academy a cessé pendant un instant d&#x27;être un simple divertissement dans la mémoire de millions de personnes.</p>
+<p id="p-3-9" class="">Je l&#x27;avais regardé chanter. Je l&#x27;avais vu rire. Je l&#x27;avais vu se battre pour être jugé comme un artiste et pas seulement comme un jeune homme malade. Et soudain, le garçon de la télévision n&#x27;était plus là.</p>
+<p id="p-3-10" class="">Cela laisse forcément quelque chose.</p>
+<p id="p-3-11" class="">Des années plus tard, son nom suffit encore à réveiller des souvenirs extrêmement précis chez beaucoup de gens de ma génération. Une prestation. Un sourire. Une note. Un silence.</p>
+<p id="p-3-12" class="">C&#x27;est pour cela que, quand je dis que Marine est la première candidate depuis longtemps à m&#x27;avoir fait basculer d&#x27;un simple intérêt vers quelque chose de beaucoup plus fort, je ne cherche pas à effacer ce que Grégory représentait.</p>
+<p id="p-3-13" class="">Ce sont deux émotions différentes.</p>
+<p id="p-3-14" class="">Avec Grégory, il y avait l&#x27;admiration, puis l&#x27;émotion immense liée à son histoire et à sa disparition.</p>
+<p id="p-3-15" class="">Avec Marine, il y a eu autre chose : la durée, la curiosité, l&#x27;envie de créer autour de ce que je ressentais, puis le passage de l&#x27;écran à la scène.</p>
+<p id="p-3-16" class="">Grégory a été le premier choc.</p>
+<p id="p-3-17" class="">Marine a été la première aventure de fan.</p>
+<p id="p-3-18" class="">Entre les deux, presque vingt ans se sont écoulés.</p>
+<p id="p-3-19" class="">C&#x27;est beaucoup.</p>
+<p id="p-3-20" class="">Assez pour croire qu&#x27;on est devenu imperméable aux mécanismes d&#x27;une émission de télévision.</p>
+<p id="p-3-21" class="">Assez pour sourire devant les adolescents qui défendent leur candidat préféré comme si l&#x27;avenir de la chanson française dépendait de leur commentaire sous une vidéo.</p>
+<p id="p-3-22" class="">Assez pour se dire qu&#x27;à quarante ans passés, on a développé un minimum de recul.</p>
+<p id="p-3-23" class="">Puis on se retrouve à quarante-cinq ans à écrire un livre intitulé Marine, de l&#x27;écran à la scène.</p>
+<p id="p-3-24" class="">Comme quoi, le recul a ses limites.</p>
+<p id="p-3-25" class="">Mais Grégory m&#x27;a appris autre chose qui a compté dans ma manière de suivre Marine : derrière l&#x27;émission, il y a des personnes. De vraies personnes. Avec leurs qualités, leurs failles, leurs mauvais jours, leurs maladresses.</p>
+<p id="p-3-26" class="">La télévision crée facilement des personnages. Le public aussi.</p>
+<p id="p-3-27" class="">On décide que l&#x27;un est gentil, que l&#x27;autre est prétentieux, qu&#x27;une candidate est jalouse, qu&#x27;un autre joue un rôle. On prend trente secondes d&#x27;image et on fabrique une vérité entière avec.</p>
+<p id="p-3-28" class="">Je n&#x27;ai jamais aimé ça.</p>
+<p id="p-3-29" class="">Peut-être parce que j&#x27;ai vu, au fil des années, à quel point l&#x27;image publique peut devenir lourde à porter.</p>
+<p id="p-3-30" class="">Alors lorsque Marine a commencé à attirer de plus en plus de commentaires, positifs comme négatifs, je me suis fixé une ligne très simple : parler de ce qu&#x27;elle montre, de ce qu&#x27;elle chante, de ce qu&#x27;elle raconte elle-même. Pas de ce que des inconnus imaginent à sa place.</p>
+<p id="p-3-31" class="">C&#x27;est un choix qui peut sembler évident.</p>
+<p id="p-3-32" class="">Sur Internet, il ne l&#x27;est pas toujours.</p>
+<p id="p-3-33" class="">Le ragot fait cliquer. Le conflit fait commenter. La petite phrase isolée de son contexte peut faire dix fois plus de vues qu&#x27;une analyse respectueuse d&#x27;une chanson.</p>
+<p id="p-3-34" class="">Le Grognard aurait pu grogner dans cette direction-là.</p>
+<p id="p-3-35" class="">Il a choisi autre chose.</p>
+<p id="p-3-36" class="">Quand je regardais Marine rire au château, douter après une évaluation, se moquer d&#x27;elle-même, imiter un train ou s&#x27;écrouler émotionnellement après une prestation, je me rappelais que la personne derrière l&#x27;écran ne m&#x27;appartenait pas.</p>
+<p id="p-3-37" class="">Je pouvais l&#x27;aimer comme artiste.</p>
+<p id="p-3-38" class="">Je pouvais être touché par sa personnalité publique.</p>
+<p id="p-3-39" class="">Je pouvais espérer sa victoire.</p>
+<p id="p-3-40" class="">Mais je ne savais pas ce qu&#x27;elle pensait une fois les caméras éteintes.</p>
+<p id="p-3-41" class="">Et c&#x27;était très bien comme ça.</p>
+<p id="p-3-42" class="">Cette distance, paradoxalement, a rendu mon admiration plus saine.</p>
+<p id="p-3-43" class="">Parce qu&#x27;elle m&#x27;obligeait à rester concentré sur ce qui m&#x27;avait arrêté au départ.</p>
+<p id="p-3-44" class="">La voix.</p>
+<p id="p-3-45" class="">Toujours la voix.</p>
+<p id="p-3-46" class="">Et peut-être que, quelque part, le souvenir de Grégory m&#x27;avait préparé à reconnaître ce moment.</p>
+<p id="p-3-47" class="">Pas le même timbre.</p>
+<p id="p-3-48" class="">Pas la même histoire.</p>
+<p id="p-3-49" class="">Pas la même époque.</p>
+<p id="p-3-50" class="">Mais cette même impression qu&#x27;un chanteur ou une chanteuse peut faire disparaître pendant quelques minutes tout ce qu&#x27;il y a autour.</p>
+<p id="p-3-51" class="">Quand Marine allait vraiment me toucher, je n&#x27;allais pas avoir besoin qu&#x27;on me l&#x27;explique.</p>
+<p id="p-3-52" class="">Je connaissais déjà cette sensation.</p>
+<p id="p-3-53" class="">Je ne savais simplement pas encore qu&#x27;elle allait revenir.</p>
+</section>
+<section class="chapter" id="sec-4" data-section="4">
+<div class="chapter-head">
+<div class="chapter-kicker">CHAPITRE 3</div>
+<h1>LE RETOUR DU CHÂTEAU, SANS LE COUP DE FOUDRE</h1></div>
+<p id="p-4-0" class="first-para">Le retour de la Star Academy en 2022 avait quelque chose de rassurant.</p>
+<p id="p-4-1" class="">Comme retrouver une maison dans laquelle on n&#x27;a pas vécu mais dont on connaît pourtant l&#x27;escalier.</p>
+<p id="p-4-2" class="">Les meubles avaient changé. Le rythme aussi. Les réseaux sociaux entouraient désormais l&#x27;émission comme une deuxième couche de spectacle. Une séquence de la quotidienne pouvait faire le tour d&#x27;Internet avant même que quelqu&#x27;un ait eu le temps de la digérer.</p>
+<p id="p-4-3" class="">Mais les fondamentaux étaient là.</p>
+<p id="p-4-4" class="">Le château.</p>
+<p id="p-4-5" class="">Les cours.</p>
+<p id="p-4-6" class="">Les évaluations.</p>
+<p id="p-4-7" class="">Les primes.</p>
+<p id="p-4-8" class="">Et Nikos, qui semblait avoir découvert un secret contre le vieillissement que personne n&#x27;avait pensé à lui demander.</p>
+<p id="p-4-9" class="">Anisha a remporté le retour de 2022. Je l&#x27;ai trouvée touchante et méritante. J&#x27;étais heureux que l&#x27;émission fonctionne à nouveau. Surtout, j&#x27;étais heureux que la musique reprenne autant de place à la télévision.</p>
+<p id="p-4-10" class="">L&#x27;année suivante, Pierre Garnier a gagné.</p>
+<p id="p-4-11" class="">Dès les premières semaines, il avait ce timbre que l&#x27;on reconnaît immédiatement. Son succès après l&#x27;émission n&#x27;a surpris personne. Helena, elle aussi, a construit quelque chose de solide. D&#x27;autres candidats ont marqué le public à leur manière.</p>
+<p id="p-4-12" class="">J&#x27;ai suivi tout cela.</p>
+<p id="p-4-13" class="">J&#x27;ai aimé.</p>
+<p id="p-4-14" class="">Mais je n&#x27;ai pas basculé.</p>
+<p id="p-4-15" class="">C&#x27;est important de le dire, parce que si j&#x27;avais été le genre de téléspectateur qui tombe amoureux artistiquement de trois candidats par saison, ce livre aurait beaucoup moins de sens.</p>
+<p id="p-4-16" class="">Je suis plutôt difficile.</p>
+<p id="p-4-17" class="">Je peux reconnaître qu&#x27;une personne chante très bien sans avoir envie d&#x27;écouter son album.</p>
+<p id="p-4-18" class="">Je peux trouver un candidat sympathique sans regarder ses interviews après l&#x27;émission.</p>
+<p id="p-4-19" class="">Je peux apprécier une saison entière et ne suivre personne six mois plus tard.</p>
+<p id="p-4-20" class="">C&#x27;est exactement ce qui s&#x27;est passé avec la promotion de Pierre.</p>
+<p id="p-4-21" class="">Je voyais pourquoi le public l&#x27;aimait. J&#x27;appréciais Helena. Je regardais Julien. Je suivais le programme comme j&#x27;avais suivi tant d&#x27;autres saisons.</p>
+<p id="p-4-22" class="">Puis la finale s&#x27;est terminée.</p>
+<p id="p-4-23" class="">Pierre a gagné.</p>
+<p id="p-4-24" class="">Et moi, je suis retourné à mes affaires.</p>
+<p id="p-4-25" class="">Entre-temps, j&#x27;avais lancé ma chaîne, Le Grognard du Net.</p>
+<p id="p-4-26" class="">Le nom annonce la couleur : je ne me prenais pas pour un journaliste en costume assis derrière un grand bureau. Je voulais parler de ce qui me plaisait, tester des idées, raconter des histoires, créer des formats. La Star Academy faisait partie de mes sujets, mais elle n&#x27;était qu&#x27;une partie de mon univers.</p>
+<p id="p-4-27" class="">Je publiais des shorts, des vidéos, des quiz. J&#x27;apprenais ce qui fonctionne et ce qui ne fonctionne pas. Je découvrais surtout cette drôle de relation avec un public que l&#x27;on ne voit jamais : des milliers de personnes représentées par des chiffres, puis soudain un commentaire tellement personnel qu&#x27;il vous rappelle qu&#x27;il y a quelqu&#x27;un derrière chaque vue.</p>
+<p id="p-4-28" class="">Je ne savais pas encore à quel point ma chaîne allait se rapprocher de la musique.</p>
+<p id="p-4-29" class="">Je ne savais pas non plus qu&#x27;une candidate de la saison suivante allait devenir l&#x27;un de mes sujets les plus naturels.</p>
+<p id="p-4-30" class="">Lorsque la promotion 2024 est arrivée, je me suis installé devant l&#x27;écran sans cérémonie particulière.</p>
+<p id="p-4-31" class="">Une nouvelle saison.</p>
+<p id="p-4-32" class="">Encore une.</p>
+<p id="p-4-33" class="">J&#x27;allais regarder les premières prestations, me faire une idée, choisir deux ou trois candidats que j&#x27;aimais bien, puis laisser le programme suivre son cours.</p>
+<p id="p-4-34" class="">C&#x27;était le plan.</p>
+<p id="p-4-35" class="">Il était très raisonnable.</p>
+<p id="p-4-36" class="">Il n&#x27;a pas tenu longtemps.</p>
+</section>
+<section class="chapter" id="sec-5" data-section="5">
+<div class="chapter-head">
+<div class="chapter-kicker">CHAPITRE 4</div>
+<h1>UNE VOIX « ORDINAIRE » QUI NE L&#x27;ÉTAIT PAS</h1></div>
+<p id="p-5-0" class="first-para">Le 12 octobre 2024, la nouvelle saison de la Star Academy commence sur TF1.</p>
+<p id="p-5-1" class="">Marine Delplace a vingt-quatre ans. Elle vient du Nord. Elle a terminé ses études de chirurgie dentaire et se retrouve soudain sur une scène où quelques secondes suffisent pour donner une première impression à des millions de téléspectateurs.</p>
+<p id="p-5-2" class="">Elle chante « Ordinaire », de Robert Charlebois.</p>
+<p id="p-5-3" class="">Il y a parfois des titres qui semblent écrits pour créer une ironie parfaite.</p>
+<p id="p-5-4" class="">Ordinaire.</p>
+<p id="p-5-5" class="">Parce que ce que j&#x27;ai entendu ce soir-là ne l&#x27;était pas vraiment.</p>
+<p id="p-5-6" class="">Je ne vais pas transformer mon souvenir en légende personnelle. Je ne me suis pas levé du canapé en criant : « Voici la gagnante ! » Je n&#x27;ai pas écrit son nom sur un mur. Je n&#x27;ai pas eu de vision mystique du trophée.</p>
+<p id="p-5-7" class="">J&#x27;ai simplement tendu l&#x27;oreille.</p>
+<p id="p-5-8" class="">Et c&#x27;est peut-être plus important.</p>
+<p id="p-5-9" class="">Une voix peut être techniquement impressionnante sans vous atteindre. Elle peut être parfaite et ne rien laisser derrière elle. Avec Marine, j&#x27;ai entendu autre chose : une puissance qui n&#x27;effaçait pas la fragilité.</p>
+<p id="p-5-10" class="">Elle pouvait envoyer une grande note, puis donner l&#x27;impression, quelques secondes plus tard, de ne pas être certaine d&#x27;avoir le droit d&#x27;être là.</p>
+<p id="p-5-11" class="">Ce mélange m&#x27;a accroché.</p>
+<p id="p-5-12" class="">Je crois que c&#x27;est même devenu, avec le temps, l&#x27;une des choses qui me plaisent le plus chez elle : la contradiction.</p>
+<p id="p-5-13" class="">La voix dit : « Je peux prendre cette scène. »</p>
+<p id="p-5-14" class="">Le regard dit parfois : « Vous êtes sûrs que je peux ? »</p>
+<p id="p-5-15" class="">Et au milieu, il y a l&#x27;humour.</p>
+<p id="p-5-16" class="">Parce que Marine n&#x27;a jamais semblé vouloir devenir un personnage solennel.</p>
+<p id="p-5-17" class="">Très vite, on découvre une fille capable de passer d&#x27;un moment de doute à une imitation improbable. Son fameux klaxon de TGV devient presque une signature parallèle. Elle imite, plaisante, se moque d&#x27;elle-même. Elle peut parler d&#x27;une peur profonde puis casser l&#x27;émotion par une remarque complètement à côté.</p>
+<p id="p-5-18" class="">Pour un spectateur, c&#x27;est redoutable.</p>
+<p id="p-5-19" class="">Le talent attire.</p>
+<p id="p-5-20" class="">L&#x27;humour attache.</p>
+<p id="p-5-21" class="">Mais ce qui m&#x27;a vraiment fait rester, ce sont les prestations.</p>
+<p id="p-5-22" class="">À mesure que les semaines passent, Marine montre plusieurs visages musicaux. Il y a la puissance, bien sûr. Les grandes chansons à voix. Céline Dion plane souvent au-dessus de son imaginaire artistique, et quand elle s&#x27;attaque à « All by Myself », quelque chose change.</p>
+<p id="p-5-23" class="">Je me souviens de cette impression très simple : là, on n&#x27;était plus dans « une candidate qui chante bien ».</p>
+<p id="p-5-24" class="">On regardait une interprète.</p>
+<p id="p-5-25" class="">Le premier couplet pouvait laisser percevoir une tension, puis la chanson montait, et elle montait avec. Arrivée sur les notes les plus dangereuses, elle ne donnait plus l&#x27;impression de demander l&#x27;autorisation.</p>
+<p id="p-5-26" class="">Elle y allait.</p>
+<p id="p-5-27" class="">Ce genre de prestation est exactement ce qui transforme un intérêt en attente.</p>
+<p id="p-5-28" class="">Après cela, je voulais savoir ce qu&#x27;elle allait faire la semaine suivante.</p>
+<p id="p-5-29" class="">Je guettais les chansons qu&#x27;on allait lui attribuer.</p>
+<p id="p-5-30" class="">Je comparais ses univers.</p>
+<p id="p-5-31" class="">Je la regardais sur des titres plus pop, plus rythmés, plus intimistes.</p>
+<p id="p-5-32" class="">Avec Charlotte Cardin, elle pouvait se déplacer vers une couleur différente. Avec Santa, l&#x27;émotion prenait une autre forme. Les duos, les chansons françaises, les grandes ballades internationales : petit à petit, la candidate que j&#x27;avais d&#x27;abord rangée dans la catégorie « grosse voix » devenait beaucoup plus difficile à enfermer dans une case.</p>
+<p id="p-5-33" class="">Et puis il y avait les moments où la technique ne comptait presque plus.</p>
+<p id="p-5-34" class="">Un a cappella.</p>
+<p id="p-5-35" class="">Une phrase qui tremble un peu.</p>
+<p id="p-5-36" class="">Un regard vers quelqu&#x27;un sur scène.</p>
+<p id="p-5-37" class="">Le genre de seconde impossible à mesurer dans une grille d&#x27;évaluation.</p>
+<p id="p-5-38" class="">C&#x27;est aussi là que le public commence à se diviser, comme toujours.</p>
+<p id="p-5-39" class="">Certains adorent.</p>
+<p id="p-5-40" class="">D&#x27;autres trouvent qu&#x27;elle doute trop.</p>
+<p id="p-5-41" class="">Certains voient son humour comme une force.</p>
+<p id="p-5-42" class="">D&#x27;autres comme un manque de sérieux.</p>
+<p id="p-5-43" class="">Internet fait son travail : il transforme une personnalité complète en quelques adjectifs.</p>
+<p id="p-5-44" class="">Moi, au contraire, j&#x27;aimais précisément qu&#x27;elle ne soit pas lisse.</p>
+<p id="p-5-45" class="">J&#x27;aimais les maladresses.</p>
+<p id="p-5-46" class="">J&#x27;aimais les moments où elle se reprenait.</p>
+<p id="p-5-47" class="">J&#x27;aimais le fait qu&#x27;on puisse sentir le travail derrière une prestation sans avoir l&#x27;impression de regarder un produit parfaitement calibré.</p>
+<p id="p-5-48" class="">C&#x27;était vivant.</p>
+<p id="p-5-49" class="">Et, chose que je n&#x27;avais pas anticipée, je commençais à m&#x27;intéresser à ce qu&#x27;il y avait avant le château.</p>
+<p id="p-5-50" class="">C&#x27;est un signe qui ne trompe pas.</p>
+<p id="p-5-51" class="">Le spectateur regarde la prochaine émission.</p>
+<p id="p-5-52" class="">Le fan commence à remonter le temps.</p>
+<p id="p-5-53" class="">Je voulais savoir d&#x27;où venait cette voix.</p>
+<p id="p-5-54" class="">Comment une étudiante en chirurgie dentaire s&#x27;était retrouvée là.</p>
+<p id="p-5-55" class="">Si elle avait toujours chanté.</p>
+<p id="p-5-56" class="">Si elle avait déjà essayé.</p>
+<p id="p-5-57" class="">Si elle avait déjà échoué.</p>
+<p id="p-5-58" class="">J&#x27;ai commencé à chercher.</p>
+<p id="p-5-59" class="">Et plus je découvrais son parcours, plus l&#x27;histoire me plaisait.</p>
+<p id="p-5-60" class="">Parce que Marine n&#x27;arrivait pas de nulle part.</p>
+<p id="p-5-61" class="">Elle arrivait de plusieurs années pendant lesquelles elle avait essayé sans que le monde entier la regarde.</p>
+<p id="p-5-62" class="">Et ça, pour raconter une histoire, c&#x27;est beaucoup plus intéressant qu&#x27;un succès tombé du ciel.</p>
+</section>
+<section class="chapter" id="sec-6" data-section="6">
+<div class="chapter-head">
+<div class="chapter-kicker">CHAPITRE 5</div>
+<h1>AVANT LE CHÂTEAU, UNE FILLE DU NORD QUI N&#x27;A PAS ARRÊTÉ D&#x27;ESSAYER</h1></div>
+<p id="p-6-0" class="first-para">Marine Delplace est née le 29 mars 2000 à Arras.</p>
+<p id="p-6-1" class="">Avant la Star Academy, avant les millions d&#x27;écoutes, avant les salles de concert, il y a une enfant qui commence le piano très jeune. Puis d&#x27;autres instruments. Le ukulélé. Un passage par le violoncelle. De la musique qui existe bien avant qu&#x27;un plateau de télévision décide de l&#x27;éclairer.</p>
+<p id="p-6-2" class="">À quatorze ans, elle tente The Voice Kids.</p>
+<p id="p-6-3" class="">Elle chante « Rolling in the Deep » d&#x27;Adele.</p>
+<p id="p-6-4" class="">Aucun fauteuil ne se retourne.</p>
+<p id="p-6-5" class="">Voilà le genre de détail que j&#x27;adore dans les parcours artistiques.</p>
+<p id="p-6-6" class="">Pas parce que l&#x27;échec est amusant. Parce qu&#x27;il remet tout en perspective.</p>
+<p id="p-6-7" class="">Imaginez l&#x27;adolescente qui rentre chez elle après une audition télévisée où personne ne s&#x27;est retourné. À cet âge, on peut facilement croire que l&#x27;histoire vient de se terminer avant d&#x27;avoir commencé.</p>
+<p id="p-6-8" class="">Sauf que non.</p>
+<p id="p-6-9" class="">Marine continue.</p>
+<p id="p-6-10" class="">En 2016, elle atteint la finale d&#x27;un concours de chant organisé au Casino d&#x27;Arras, « Y&#x27;a d&#x27;la voix ».</p>
+<p id="p-6-11" class="">Puis la musique cohabite avec un projet beaucoup plus classique, beaucoup plus rassurant aussi : les études.</p>
+<p id="p-6-12" class="">La chirurgie dentaire.</p>
+<p id="p-6-13" class="">Rien que le contraste est magnifique.</p>
+<p id="p-6-14" class="">D&#x27;un côté, une jeune femme qui peut rêver d&#x27;une scène.</p>
+<p id="p-6-15" class="">De l&#x27;autre, des années d&#x27;études exigeantes, un métier concret, une voie presque toute tracée.</p>
+<p id="p-6-16" class="">Marine a elle-même raconté après sa victoire qu&#x27;elle avait pratiquement terminé ce parcours et qu&#x27;il ne lui restait notamment que sa thèse d&#x27;exercice à finaliser pour obtenir le titre de docteure.</p>
+<p id="p-6-17" class="">C&#x27;est ce détail qui me touche dans son histoire : la musique n&#x27;était pas son seul filet.</p>
+<p id="p-6-18" class="">Elle aurait pu continuer dans une autre vie.</p>
+<p id="p-6-19" class="">Une vraie vie, parfaitement respectable, avec un cabinet, des patients, des horaires, des douleurs dentaires et probablement beaucoup moins de paillettes.</p>
+<p id="p-6-20" class="">Mais la musique continuait de pousser à côté.</p>
+<p id="p-6-21" class="">En 2022, elle publie « Ma faute ».</p>
+<p id="p-6-22" class="">À ce moment-là, le titre ne bouleverse pas encore les classements. Il existe. C&#x27;est déjà énorme.</p>
+<p id="p-6-23" class="">Il y a quelque chose de profondément symbolique dans le fait que cette chanson précède la Star Academy.</p>
+<p id="p-6-24" class="">Elle prouve que Marine n&#x27;a pas attendu qu&#x27;une émission lui donne le droit d&#x27;écrire.</p>
+<p id="p-6-25" class="">Elle avait déjà commencé.</p>
+<p id="p-6-26" class="">Elle avait déjà une voix artistique.</p>
+<p id="p-6-27" class="">Elle avait déjà quelque chose à raconter.</p>
+<p id="p-6-28" class="">Puis, en 2024, alors qu&#x27;elle arrive au bout de ses études, des amis l&#x27;encouragent à s&#x27;inscrire à la Star Academy. Elle expliquera plus tard qu&#x27;elle ne pensait pas forcément être rappelée.</p>
+<p id="p-6-29" class="">Elle l&#x27;est.</p>
+<p id="p-6-30" class="">Et là, tout ce qui jusque-là vivait dans des espaces séparés se rencontre d&#x27;un coup.</p>
+<p id="p-6-31" class="">La petite fille au piano.</p>
+<p id="p-6-32" class="">L&#x27;adolescente de The Voice Kids.</p>
+<p id="p-6-33" class="">La finaliste d&#x27;un concours local.</p>
+<p id="p-6-34" class="">L&#x27;étudiante en dentaire.</p>
+<p id="p-6-35" class="">La jeune femme qui avait mis « Ma faute » en ligne.</p>
+<p id="p-6-36" class="">Tout cela entre dans le château en même temps qu&#x27;elle.</p>
+<p id="p-6-37" class="">Quand j&#x27;ai découvert ces éléments, mon intérêt a changé de nature.</p>
+<p id="p-6-38" class="">Je ne regardais plus seulement la candidate de 2024.</p>
+<p id="p-6-39" class="">Je voyais le chemin.</p>
+<p id="p-6-40" class="">Et je crois que nous sommes nombreux à être sensibles à ce genre de trajectoire : pas la réussite instantanée, mais l&#x27;idée qu&#x27;un « non » reçu à quatorze ans n&#x27;a pas forcément le dernier mot.</p>
+<p id="p-6-41" class="">Quand Marine gagne la Star Academy dix ans environ après cette audition sans fauteuil retourné, la boucle est presque trop parfaite pour un scénariste.</p>
+<p id="p-6-42" class="">Sauf que personne ne l&#x27;avait écrite à l&#x27;avance.</p>
+<p id="p-6-43" class="">C&#x27;est précisément ce qui la rend belle.</p>
+<p id="p-6-44" class="">« Ma faute », elle aussi, va connaître une deuxième vie.</p>
+<p id="p-6-45" class="">Pendant l&#x27;émission, les auditeurs redécouvrent le morceau. Les écoutes augmentent. Une chanson publiée dans une relative discrétion commence à circuler partout parce que le public veut entendre ce que Marine faisait avant Marine.</p>
+<p id="p-6-46" class="">J&#x27;en fais partie.</p>
+<p id="p-6-47" class="">Je l&#x27;écoute.</p>
+<p id="p-6-48" class="">Je comprends immédiatement pourquoi ce titre est important.</p>
+<p id="p-6-49" class="">Il ne ressemble pas à un morceau fabriqué en urgence après une victoire télévisée. Il appartient à l&#x27;avant.</p>
+<p id="p-6-50" class="">Il contient déjà cette manière qu&#x27;elle a de mêler la force et la faille.</p>
+<p id="p-6-51" class="">À partir de là, je n&#x27;attendais plus seulement ses performances dans l&#x27;émission.</p>
+<p id="p-6-52" class="">J&#x27;attendais sa carrière.</p>
+<p id="p-6-53" class="">C&#x27;est beaucoup plus dangereux pour un homme qui continue de prétendre qu&#x27;il n&#x27;est « pas spécialement fan ».</p>
+<p id="p-6-54" class="">J&#x27;avais pourtant encore quelques semaines avant d&#x27;être officiellement démasqué.</p>
+</section>
+<section class="chapter" id="sec-7" data-section="7">
+<div class="chapter-head">
+<div class="chapter-kicker">CHAPITRE 6</div>
+<h1>LE CHÂTEAU, LES DOUTES ET LE KLAXON DU TGV</h1></div>
+<p id="p-7-0" class="first-para">Il serait facile de raconter la saison de Marine comme une marche triomphale vers la victoire.</p>
+<p id="p-7-1" class="">Ce serait faux.</p>
+<p id="p-7-2" class="">Et ce serait beaucoup moins intéressant.</p>
+<p id="p-7-3" class="">Ce qui m&#x27;a attaché à elle, justement, c&#x27;est qu&#x27;elle ne donnait jamais l&#x27;impression de vivre une autoroute vers la finale.</p>
+<p id="p-7-4" class="">Elle doutait.</p>
+<p id="p-7-5" class="">Parfois beaucoup.</p>
+<p id="p-7-6" class="">Les débriefs pouvaient la toucher. Les évaluations comptaient énormément. Une prestation réussie ne semblait pas toujours suffire à faire taire la petite voix qui lui demandait si elle méritait vraiment sa place.</p>
+<p id="p-7-7" class="">Ce contraste entre une capacité vocale évidente et un manque de confiance parfois tout aussi évident était fascinant à regarder.</p>
+<p id="p-7-8" class="">Pas parce que j&#x27;aimais la voir mal.</p>
+<p id="p-7-9" class="">Au contraire.</p>
+<p id="p-7-10" class="">Parce qu&#x27;on voyait la progression là où elle est la plus difficile : pas seulement apprendre à mieux chanter, mais apprendre à croire que l&#x27;on peut chanter devant tout le monde.</p>
+<p id="p-7-11" class="">La Star Academy est cruelle avec ceux qui doutent. Elle place des caméras partout autour de leurs hésitations.</p>
+<p id="p-7-12" class="">Un artiste peut vivre une mauvaise journée dans l&#x27;intimité. Un académicien la vit devant des téléspectateurs qui, cinq minutes plus tard, débattent de sa personnalité comme s&#x27;ils avaient passé dix ans avec lui.</p>
+<p id="p-7-13" class="">Marine n&#x27;a pas échappé à ça.</p>
+<p id="p-7-14" class="">Certains lui reprochaient ses moments de fragilité. D&#x27;autres trouvaient qu&#x27;elle se plaignait. D&#x27;autres encore voulaient voir derrière chaque interaction une rivalité ou une stratégie.</p>
+<p id="p-7-15" class="">Je regardais tout ça avec un mélange d&#x27;amusement et d&#x27;agacement.</p>
+<p id="p-7-16" class="">Parce que, pendant ce temps, la même fille pouvait se mettre à imiter Chantal Ladesou ou reproduire le klaxon d&#x27;un TGV avec un sérieux absolument disproportionné.</p>
+<p id="p-7-17" class="">Et là, tout redevenait simple.</p>
+<p id="p-7-18" class="">Marine était drôle.</p>
+<p id="p-7-19" class="">Pas « drôle parce qu&#x27;elle raconte des blagues écrites ».</p>
+<p id="p-7-20" class="">Drôle parce qu&#x27;elle avait cette capacité à faire surgir quelque chose d&#x27;absurde dans un moment parfaitement normal.</p>
+<p id="p-7-21" class="">Pour quelqu&#x27;un qui s&#x27;appelle Le Grognard du Net, c&#x27;était forcément un terrain dangereux.</p>
+<p id="p-7-22" class="">Je pouvais faire une vidéo sur une grande performance vocale et, le lendemain, avoir envie de parler d&#x27;un bruit de train.</p>
+<p id="p-7-23" class="">Le mélange me plaisait.</p>
+<p id="p-7-24" class="">Il rendait le personnage public impossible à réduire à « la chanteuse à voix ».</p>
+<p id="p-7-25" class="">Et puis il y avait le groupe.</p>
+<p id="p-7-26" class="">Ebony, évidemment, allait devenir la grande autre figure de la saison jusqu&#x27;à la finale. Franck avait sa puissance et ses moments marquants. Charles progressait. Ulysse avait son parcours. Maïa, Maureen, Marguerite et les autres donnaient chacun une couleur à cette promotion.</p>
+<p id="p-7-27" class="">Je ne voulais pas regarder Marine seule au milieu du décor.</p>
+<p id="p-7-28" class="">Une saison de Star Academy n&#x27;existe que parce que les candidats se répondent, se soutiennent, s&#x27;agacent parfois, se font rire, chantent ensemble.</p>
+<p id="p-7-29" class="">Les réseaux sociaux adorent transformer cette proximité en camps.</p>
+<p id="p-7-30" class="">Team Marine.</p>
+<p id="p-7-31" class="">Team Ebony.</p>
+<p id="p-7-32" class="">Comme si apprécier l&#x27;une exigeait forcément de diminuer l&#x27;autre.</p>
+<p id="p-7-33" class="">Je n&#x27;ai jamais aimé cette logique.</p>
+<p id="p-7-34" class="">J&#x27;espérais que Marine gagne, oui.</p>
+<p id="p-7-35" class="">Cela ne m&#x27;obligeait pas à nier le talent d&#x27;Ebony.</p>
+<p id="p-7-36" class="">Au contraire : une finale est plus belle quand la personne en face mérite elle aussi d&#x27;être là.</p>
+<p id="p-7-37" class="">Marine le dira d&#x27;ailleurs après sa victoire : elle voyait Ebony comme une finaliste évidente.</p>
+<p id="p-7-38" class="">Pendant la saison, certaines prestations deviennent des repères dans mon suivi.</p>
+<p id="p-7-39" class="">« All by Myself » reste l&#x27;un des moments où je me dis : voilà, c&#x27;est pour ça.</p>
+<p id="p-7-40" class="">Mais je retiens aussi les moments plus légers, les chansons partagées, les duos, les changements d&#x27;univers. J&#x27;aimais la voir confrontée à autre chose qu&#x27;à la grande ballade attendue.</p>
+<p id="p-7-41" class="">Parce qu&#x27;une carrière ne se construit pas seulement sur la capacité à tenir une note spectaculaire.</p>
+<p id="p-7-42" class="">Elle se construit sur une identité.</p>
+<p id="p-7-43" class="">Et l&#x27;identité de Marine commençait à se dessiner entre plusieurs choses qui ne devraient pas toujours bien fonctionner ensemble : la variété française, la pop, le piano, les grandes voix, l&#x27;autodérision et cette façon de passer d&#x27;une émotion très forte à une remarque totalement banale.</p>
+<p id="p-7-44" class="">Je me suis mis à faire davantage de vidéos.</p>
+<p id="p-7-45" class="">Au départ, c&#x27;était naturel : ma chaîne parlait déjà de Star Academy.</p>
+<p id="p-7-46" class="">Mais je remarquais que Marine revenait souvent.</p>
+<p id="p-7-47" class="">Une prestation.</p>
+<p id="p-7-48" class="">Une anecdote.</p>
+<p id="p-7-49" class="">Une actualité.</p>
+<p id="p-7-50" class="">« Ma faute ».</p>
+<p id="p-7-51" class="">Puis une nouvelle vidéo.</p>
+<p id="p-7-52" class="">Et encore une.</p>
+<p id="p-7-53" class="">Je pouvais me raconter que c&#x27;était parce que le public aimait le sujet.</p>
+<p id="p-7-54" class="">C&#x27;était vrai.</p>
+<p id="p-7-55" class="">Mais ce n&#x27;était pas toute la vérité.</p>
+<p id="p-7-56" class="">La vérité, c&#x27;est que j&#x27;aimais moi aussi raconter cette histoire.</p>
+<p id="p-7-57" class="">Je me prenais au jeu.</p>
+<p id="p-7-58" class="">Quand elle devait chanter quelque chose de difficile, je voulais voir ce qu&#x27;elle allait en faire.</p>
+<p id="p-7-59" class="">Quand elle doutait, j&#x27;avais envie qu&#x27;elle se relève.</p>
+<p id="p-7-60" class="">Quand elle réussissait, j&#x27;avais ce petit sentiment idiot de satisfaction que connaissent tous les fans : comme si nous avions participé à la note alors que nous étions assis à plusieurs centaines de kilomètres.</p>
+<p id="p-7-61" class="">Nous n&#x27;avions rien fait.</p>
+<p id="p-7-62" class="">Mais nous étions contents quand même.</p>
+<p id="p-7-63" class="">C&#x27;est ça, être fan.</p>
+<p id="p-7-64" class="">Accepter une forme d&#x27;illogisme joyeux.</p>
+<p id="p-7-65" class="">Puis la fin de saison s&#x27;est rapprochée.</p>
+<p id="p-7-66" class="">Et à mesure que les candidats quittaient le château, la question devenait de plus en plus réelle.</p>
+<p id="p-7-67" class="">Et si Marine allait jusqu&#x27;au bout ?</p>
+<p id="p-7-68" class="">Pour la première fois depuis très longtemps, je ne regardais plus la finale à venir comme un simple résultat de télévision.</p>
+<p id="p-7-69" class="">J&#x27;avais quelqu&#x27;un à soutenir.</p>
+<p id="p-7-70" class="">Le Grognard était foutu.</p>
+<p id="p-7-71" class="">Il y a aussi des prestations qui, avec le recul, ressemblent à des petites bornes sur la route.</p>
+<p id="p-7-72" class="">Je pense à « Pop-corn salé » avec Santa, à ce piano qui semblait vouloir participer lui aussi au spectacle, à la manière dont Marine pouvait entrer dans une chanson chargée d&#x27;émotion sans forcément chercher à la reproduire à l&#x27;identique. Je pense à Sting et « Message in a Bottle », à Charlotte Cardin, à ces moments où l&#x27;émission la poussait hors du terrain sur lequel on l&#x27;attendait le plus facilement.</p>
+<p id="p-7-73" class="">Je pense également aux duos avec Charles, notamment lorsqu&#x27;ils se retrouvaient sur de grandes chansons où il était impossible de se cacher derrière un arrangement. Quand on partage une scène avec quelqu&#x27;un qui possède lui aussi une vraie présence, on ne peut pas simplement « faire sa partie ». Il faut écouter, répondre, respirer ensemble. C&#x27;est un autre métier que celui de réussir une évaluation seul devant les professeurs.</p>
+<p id="p-7-74" class="">Et puis il y a toutes les chansons qui faisaient ressortir chez Marine son goût pour la variété populaire. Johnny Hallyday, Céline Dion, Bruno Mars, Santa, les grandes mélodies françaises ou internationales : on sentait qu&#x27;elle n&#x27;avait pas envie d&#x27;être enfermée dans un genre à la mode simplement parce qu&#x27;il fallait paraître moderne.</p>
+<p id="p-7-75" class="">Ce point-là me parlait beaucoup.</p>
+<p id="p-7-76" class="">Je n&#x27;ai jamais compris pourquoi aimer une grande chanson populaire devrait être quelque chose dont on s&#x27;excuse.</p>
+<p id="p-7-77" class="">Une chanson touche ou elle ne touche pas.</p>
+<p id="p-7-78" class="">Le reste, ce sont souvent des discussions de spécialistes.</p>
+<p id="p-7-79" class="">Marine pouvait aller vers quelque chose de très contemporain puis revenir au piano, à une mélodie presque classique, sans donner l&#x27;impression de trahir l&#x27;une ou l&#x27;autre partie d&#x27;elle-même.</p>
+<p id="p-7-80" class="">Et au milieu de tout cela, il y avait les amitiés et les affinités du château.</p>
+<p id="p-7-81" class="">Comme tous les téléspectateurs, j&#x27;avais mes impressions. On voit des gens vivre ensemble pendant des semaines, forcément on croit repérer des complicités particulières, des petits agacements, des liens qui se renforcent. Mais je me méfiais de mes propres conclusions.</p>
+<p id="p-7-82" class="">Avec Franck, Ebony, Ulysse, Maïa, Charles, Maureen, Marguerite et les autres, Marine vivait une expérience que nous regardions de l&#x27;extérieur. Nous avions des images ; eux avaient des journées entières.</p>
+<p id="p-7-83" class="">C&#x27;est une différence immense.</p>
+<p id="p-7-84" class="">À force de suivre une quotidienne, on oublie facilement que nous voyons un montage. Pas un mensonge : un montage. Des heures réduites à quelques minutes. Un rire peut devenir le résumé d&#x27;une journée. Une phrase sortie au mauvais moment peut devenir le résumé d&#x27;une relation.</p>
+<p id="p-7-85" class="">J&#x27;essayais donc de rester prudent dans mes vidéos.</p>
+<p id="p-7-86" class="">Je pouvais dire : « J&#x27;ai l&#x27;impression que… »</p>
+<p id="p-7-87" class="">Je pouvais dire : « Dans cette séquence… »</p>
+<p id="p-7-88" class="">Mais je ne voulais pas écrire dans ma tête un roman parallèle où je saurais ce que les candidats pensaient les uns des autres.</p>
+<p id="p-7-89" class="">C&#x27;est aussi ce qui m&#x27;a empêché de tomber dans l&#x27;un des pièges les plus faciles du fandom : le besoin de choisir des ennemis.</p>
+<p id="p-7-90" class="">Pour soutenir Marine, certains internautes pensaient qu&#x27;il fallait forcément critiquer Ebony.</p>
+<p id="p-7-91" class="">D&#x27;autres faisaient l&#x27;inverse.</p>
+<p id="p-7-92" class="">Moi, je n&#x27;y arrivais pas.</p>
+<p id="p-7-93" class="">Ebony avait une identité vocale forte, une présence, une manière d&#x27;aborder la scène différente de Marine. C&#x27;était justement ce qui rendait leur duel final intéressant. Si elles avaient été deux copies l&#x27;une de l&#x27;autre, quel aurait été l&#x27;intérêt ?</p>
+<p id="p-7-94" class="">Avec Franck, c&#x27;était encore autre chose. Certaines de ses performances pouvaient arrêter une conversation, et son « SOS d&#x27;un terrien en détresse » a rappelé à tout le monde qu&#x27;une saison se construit avec plusieurs voix capables de créer leur propre moment.</p>
+<p id="p-7-95" class="">Charles a aussi grandi au fil des semaines. Maïa apportait son énergie. Marguerite avait sa singularité. Ulysse a traversé plusieurs nominations et continué. Maureen, Maïa, Emma, Masseo, Paul, Noah, Thomas, Julie : chacun a laissé des souvenirs différents.</p>
+<p id="p-7-96" class="">Je ne veux pas transformer ce livre en annuaire de promotion.</p>
+<p id="p-7-97" class="">Mais Marine n&#x27;aurait pas été la même candidate sans eux autour d&#x27;elle.</p>
+<p id="p-7-98" class="">Une personnalité se révèle aussi par contraste.</p>
+<p id="p-7-99" class="">Son humour ressortait parce que d&#x27;autres lui répondaient.</p>
+<p id="p-7-100" class="">Ses doutes existaient dans un groupe où chacun avait les siens.</p>
+<p id="p-7-101" class="">Ses duos fonctionnaient parce qu&#x27;il y avait quelqu&#x27;un en face.</p>
+<p id="p-7-102" class="">Et cette promotion, comme toutes les bonnes promotions de la Star Academy, a fini par créer son petit monde.</p>
+<p id="p-7-103" class="">Nous avions nos habitudes de spectateurs.</p>
+<p id="p-7-104" class="">Nous savions qui avait tendance à plaisanter, qui travaillait de telle manière, qui semblait plus à l&#x27;aise en danse ou en théâtre, qui pouvait se mettre une pression folle pour une évaluation.</p>
+<p id="p-7-105" class="">Puis, une semaine après l&#x27;autre, des personnes disparaissaient de l&#x27;écran.</p>
+<p id="p-7-106" class="">C&#x27;est la règle du jeu, mais elle change l&#x27;atmosphère.</p>
+<p id="p-7-107" class="">Le château devient plus vide.</p>
+<p id="p-7-108" class="">Les voix que l&#x27;on entendait tous les jours ne sont plus là.</p>
+<p id="p-7-109" class="">Et ceux qui restent comprennent qu&#x27;ils se rapprochent de quelque chose qu&#x27;ils n&#x27;osaient parfois même pas envisager en entrant.</p>
+<p id="p-7-110" class="">Chez Marine, cette progression me fascinait parce qu&#x27;elle ne semblait jamais totalement s&#x27;habituer à l&#x27;idée.</p>
+<p id="p-7-111" class="">Elle avançait.</p>
+<p id="p-7-112" class="">Elle réussissait.</p>
+<p id="p-7-113" class="">Elle gagnait des étapes.</p>
+<p id="p-7-114" class="">Et elle pouvait encore donner l&#x27;impression de se demander comment elle avait atterri là.</p>
+<p id="p-7-115" class="">C&#x27;est peut-être ce que certains trouvaient agaçant.</p>
+<p id="p-7-116" class="">Moi, c&#x27;est ce que je trouvais humain.</p>
+</section>
+<section class="chapter" id="sec-8" data-section="8">
+<div class="chapter-head">
+<div class="chapter-kicker">CHAPITRE 7</div>
+<h1>QUAND LE SPECTATEUR DEVIENT FAN</h1></div>
+<p id="p-8-0" class="first-para">Je ne sais pas quel est le critère officiel pour obtenir sa carte de fan.</p>
+<p id="p-8-1" class="">Il n&#x27;existe probablement pas de formulaire.</p>
+<p id="p-8-2" class="">Heureusement, parce qu&#x27;il faudrait cocher des cases embarrassantes.</p>
+<p id="p-8-3" class="">« Avez-vous déjà regardé plusieurs fois la même prestation ? »</p>
+<p id="p-8-4" class="">Oui.</p>
+<p id="p-8-5" class="">« Avez-vous déjà expliqué à quelqu&#x27;un qui ne vous avait rien demandé pourquoi cette interprétation était meilleure que la précédente ? »</p>
+<p id="p-8-6" class="">Probablement.</p>
+<p id="p-8-7" class="">« Avez-vous déjà ouvert YouTube pour regarder une vidéo de deux minutes et constaté qu&#x27;une heure plus tard vous étiez toujours sur le même sujet ? »</p>
+<p id="p-8-8" class="">Je refuse de répondre sans avocat.</p>
+<p id="p-8-9" class="">Dans mon cas, le passage de spectateur à fan s&#x27;est fait par accumulation.</p>
+<p id="p-8-10" class="">Il n&#x27;y a pas eu de bouton.</p>
+<p id="p-8-11" class="">Il y a eu « Ordinaire ».</p>
+<p id="p-8-12" class="">Puis les autres prestations.</p>
+<p id="p-8-13" class="">Puis « Ma faute ».</p>
+<p id="p-8-14" class="">Puis le passé de Marine que je découvrais.</p>
+<p id="p-8-15" class="">Puis les vidéos que je fabriquais.</p>
+<p id="p-8-16" class="">Puis les réactions de mon propre public.</p>
+<p id="p-8-17" class="">C&#x27;est là qu&#x27;une chose intéressante s&#x27;est produite : ma passion est devenue collective.</p>
+<p id="p-8-18" class="">Je n&#x27;étais plus seulement devant ma télévision.</p>
+<p id="p-8-19" class="">Je publiais une vidéo et des gens répondaient.</p>
+<p id="p-8-20" class="">Ils me racontaient leur prestation préférée.</p>
+<p id="p-8-21" class="">Ils défendaient Marine.</p>
+<p id="p-8-22" class="">Ils débattaient.</p>
+<p id="p-8-23" class="">Ils attendaient la suite.</p>
+<p id="p-8-24" class="">Certains n&#x27;étaient pas d&#x27;accord avec moi, ce qui est généralement un signe que l&#x27;humanité fonctionne encore correctement.</p>
+<p id="p-8-25" class="">La chaîne Le Grognard du Net est devenue, sur certains sujets, une sorte de salon virtuel où l&#x27;on reparlait de la Star Academy après l&#x27;émission.</p>
+<p id="p-8-26" class="">Et Marine occupait de plus en plus de place dans ce salon.</p>
+<p id="p-8-27" class="">Je me souviens avoir voulu faire des contenus qui ne se contentent pas de dire : « Regardez, Marine a chanté ça. »</p>
+<p id="p-8-28" class="">Je voulais raconter.</p>
+<p id="p-8-29" class="">Pourquoi cette prestation fonctionne ?</p>
+<p id="p-8-30" class="">Pourquoi le public s&#x27;attache-t-il autant à elle ?</p>
+<p id="p-8-31" class="">Qu&#x27;est-ce qui, dans son parcours, donne cette impression de proximité ?</p>
+<p id="p-8-32" class="">Pourquoi ses doutes ne détruisent-ils pas son image mais, au contraire, semblent parfois la rendre plus humaine ?</p>
+<p id="p-8-33" class="">Je préparais des vidéos longues, des formats en plusieurs parties. Je retraçais son passage à The Voice Kids, la création de « Ma faute », son aventure au château, les prestations, les liens avec les autres académiciens, les moments drôles, les moments de doute.</p>
+<p id="p-8-34" class="">Je voulais être précis.</p>
+<p id="p-8-35" class="">Je corrigeais une information si elle était fausse.</p>
+<p id="p-8-36" class="">Je cherchais la date d&#x27;un événement.</p>
+<p id="p-8-37" class="">Je vérifiais une chanson.</p>
+<p id="p-8-38" class="">Je faisais attention à ne pas transformer une impression de téléspectateur en vérité sur une personne.</p>
+<p id="p-8-39" class="">C&#x27;est aussi à ce moment-là que j&#x27;ai compris quelque chose sur le mot « fan ».</p>
+<p id="p-8-40" class="">Pendant longtemps, je lui avais associé une image un peu caricaturale : la personne qui hurle devant une barrière, collectionne absolument tout et connaît l&#x27;heure de naissance du chien de la cousine du chanteur.</p>
+<p id="p-8-41" class="">Mais être fan peut être beaucoup plus simple.</p>
+<p id="p-8-42" class="">C&#x27;est accorder du temps.</p>
+<p id="p-8-43" class="">Du vrai temps.</p>
+<p id="p-8-44" class="">Du temps pour écouter.</p>
+<p id="p-8-45" class="">Du temps pour créer.</p>
+<p id="p-8-46" class="">Du temps pour transmettre.</p>
+<p id="p-8-47" class="">J&#x27;avais envie que des gens découvrent Marine à travers mes vidéos.</p>
+<p id="p-8-48" class="">J&#x27;avais envie de montrer ce que j&#x27;aimais chez elle sans tomber dans l&#x27;adulation aveugle.</p>
+<p id="p-8-49" class="">Et j&#x27;avais surtout envie de rester positif.</p>
+<p id="p-8-50" class="">Le mot que je cherchais pendant longtemps était celui-là : bienveillant.</p>
+<p id="p-8-51" class="">Je voulais être un fan bienveillant.</p>
+<p id="p-8-52" class="">Ça ne veut pas dire tout aimer.</p>
+<p id="p-8-53" class="">Ça ne veut pas dire dire « parfait » à chaque chanson.</p>
+<p id="p-8-54" class="">Ça veut dire ne pas chercher la faille privée, ne pas inventer de scandale, ne pas participer à la machine à ragots juste parce qu&#x27;une miniature agressive ferait plus de clics.</p>
+<p id="p-8-55" class="">Je pouvais donner mon avis sur une chanson.</p>
+<p id="p-8-56" class="">Je pouvais préférer une prestation à une autre.</p>
+<p id="p-8-57" class="">Mais je ne voulais jamais oublier qu&#x27;il y avait une jeune femme réelle derrière ce que je commentais.</p>
+<p id="p-8-58" class="">Cette ligne a aussi guidé mes créations musicales.</p>
+<p id="p-8-59" class="">À un moment, j&#x27;ai commencé à imaginer des chansons-hommages, des titres inspirés par l&#x27;univers que j&#x27;associais à Marine, par l&#x27;émotion de son parcours, par ce que sa musique provoquait chez moi.</p>
+<p id="p-8-60" class="">Je me suis imposé une règle très claire : ne jamais copier sa voix.</p>
+<p id="p-8-61" class="">Ne jamais faire croire qu&#x27;elle avait chanté quelque chose qu&#x27;elle n&#x27;avait pas chanté.</p>
+<p id="p-8-62" class="">Ne jamais utiliser mon admiration comme prétexte pour lui voler son identité.</p>
+<p id="p-8-63" class="">Mes chansons de fan devaient rester mes chansons.</p>
+<p id="p-8-64" class="">Un hommage, pas une imitation.</p>
+<p id="p-8-65" class="">J&#x27;ai notamment travaillé sur « À Cœur Ouvert », un titre pensé comme une déclaration artistique autour de son aventure, puis d&#x27;autres créations liées à l&#x27;univers Star Academy.</p>
+<p id="p-8-66" class="">Ce n&#x27;était pas « la nouvelle chanson de Marine ».</p>
+<p id="p-8-67" class="">C&#x27;était la chanson d&#x27;un fan.</p>
+<p id="p-8-68" class="">La différence est fondamentale.</p>
+<p id="p-8-69" class="">Mon site aussi a commencé à refléter cette place grandissante.</p>
+<p id="p-8-70" class="">Je rassemblais mes vidéos, mes créations, mes projets. Sans m&#x27;en rendre compte, j&#x27;étais en train de construire des archives de mon propre enthousiasme.</p>
+<p id="p-8-71" class="">C&#x27;est drôle à dire aujourd&#x27;hui, mais ces vidéos racontent presque mieux que ma mémoire l&#x27;évolution de ma passion.</p>
+<p id="p-8-72" class="">Au début, je parle d&#x27;une candidate.</p>
+<p id="p-8-73" class="">Puis je parle de Marine.</p>
+<p id="p-8-74" class="">La nuance est minuscule.</p>
+<p id="p-8-75" class="">Elle change tout.</p>
+</section>
+<section class="chapter" id="sec-9" data-section="9">
+<div class="chapter-head">
+<div class="chapter-kicker">CHAPITRE 8</div>
+<h1>LE GROGNARD SE MET À RACONTER MARINE</h1></div>
+<p id="p-9-0" class="first-para">Créer du contenu sur quelqu&#x27;un qu&#x27;on admire est un exercice plus compliqué qu&#x27;il n&#x27;y paraît.</p>
+<p id="p-9-1" class="">Si l&#x27;on est trop distant, on perd ce qui fait l&#x27;intérêt du regard de fan.</p>
+<p id="p-9-2" class="">Si l&#x27;on est trop enthousiaste, on transforme chaque respiration en événement historique.</p>
+<p id="p-9-3" class="">Il faut trouver un milieu.</p>
+<p id="p-9-4" class="">Moi, j&#x27;avais mon personnage : Le Grognard du Net.</p>
+<p id="p-9-5" class="">Rien que le nom m&#x27;aidait à ne pas devenir trop solennel.</p>
+<p id="p-9-6" class="">Un grognard qui se met à faire des vidéos pleines d&#x27;émotion sur une chanteuse de vingt-quatre ans sortie d&#x27;un télécrochet, il y a déjà une part d&#x27;autodérision intégrée au concept.</p>
+<p id="p-9-7" class="">Je l&#x27;assumais.</p>
+<p id="p-9-8" class="">J&#x27;ai commencé à parler de ses prestations, de « Ma faute », de son parcours, mais aussi de ces petits événements qui construisent une carrière après une émission.</p>
+<p id="p-9-9" class="">Quand Marine est allée chanter « Les Corons » au stade Bollaert, le 16 février 2025, devant près de quarante mille supporters de Lens, j&#x27;ai immédiatement vu pourquoi ce moment comptait.</p>
+<p id="p-9-10" class="">Ce n&#x27;était pas simplement « la gagnante de la Star Academy invitée dans un stade ».</p>
+<p id="p-9-11" class="">C&#x27;était une fille du coin qui chantait un hymne du Nord au milieu d&#x27;un lieu qu&#x27;elle connaissait comme supportrice.</p>
+<p id="p-9-12" class="">L&#x27;image avait quelque chose de circulaire.</p>
+<p id="p-9-13" class="">La télévision l&#x27;avait emmenée loin de chez elle pour la rendre célèbre, et quelques semaines après sa victoire, elle revenait chez elle avec un micro.</p>
+<p id="p-9-14" class="">Je faisais des shorts autour de ce moment, de sa découverte du stade, de l&#x27;émotion du public.</p>
+<p id="p-9-15" class="">D&#x27;autres jours, le sujet était plus léger.</p>
+<p id="p-9-16" class="">Une vidéo en studio.</p>
+<p id="p-9-17" class="">Une collaboration possible.</p>
+<p id="p-9-18" class="">Une chanson.</p>
+<p id="p-9-19" class="">Un anniversaire.</p>
+<p id="p-9-20" class="">J&#x27;ai préparé un hommage pour ses vingt-cinq ans en remontant son histoire : Arras, The Voice Kids, « Ma faute », le château, la finale.</p>
+<p id="p-9-21" class="">J&#x27;ai fait des vidéos qui demandaient aux fans ce qu&#x27;ils pensaient d&#x27;un duo, d&#x27;un style, d&#x27;une chanson.</p>
+<p id="p-9-22" class="">J&#x27;ai comparé certaines interprétations, comme lorsque Marine et un talent de The Voice ont tous deux abordé « Glimpse of Us ».</p>
+<p id="p-9-23" class="">Je me suis même retrouvé à corriger un détail qui peut sembler dérisoire à n&#x27;importe qui d&#x27;autre : non, dans telle séquence, Marine n&#x27;était pas restée imperturbable face à un lapin sur scène ; elle était complètement folle de joie.</p>
+<p id="p-9-24" class="">Voilà le niveau où nous en étions.</p>
+<p id="p-9-25" class="">Je connaissais désormais l&#x27;importance émotionnelle d&#x27;un lapin.</p>
+<p id="p-9-26" class="">Le Grognard avait beaucoup changé.</p>
+<p id="p-9-27" class="">Mais ce que j&#x27;aimais le plus, c&#x27;étaient les formats longs.</p>
+<p id="p-9-28" class="">Parce qu&#x27;un short attrape un instant.</p>
+<p id="p-9-29" class="">Une vidéo longue peut raconter une trajectoire.</p>
+<p id="p-9-30" class="">J&#x27;ai voulu expliquer pourquoi le public aimait Marine, pas seulement constater qu&#x27;il l&#x27;aimait. J&#x27;ai parlé de sa simplicité, de sa maladresse parfois revendiquée, de son humour, de ses doutes, de ses goûts, de la manière dont elle communiquait après l&#x27;émission.</p>
+<p id="p-9-31" class="">Je me méfiais particulièrement des rumeurs.</p>
+<p id="p-9-32" class="">À mesure que Marine devenait connue, Internet faisait ce qu&#x27;Internet fait toujours : il remplissait les blancs.</p>
+<p id="p-9-33" class="">Une photo devient une histoire.</p>
+<p id="p-9-34" class="">Un regard devient une relation.</p>
+<p id="p-9-35" class="">Un silence devient une brouille.</p>
+<p id="p-9-36" class="">Je ne voulais pas bâtir ma chaîne là-dessus.</p>
+<p id="p-9-37" class="">Si Marine disait quelque chose publiquement, je pouvais le raconter.</p>
+<p id="p-9-38" class="">Si une information était vérifiée, je pouvais la commenter.</p>
+<p id="p-9-39" class="">Mais je ne voulais pas fabriquer une vie parallèle pour obtenir quelques milliers de vues de plus.</p>
+<p id="p-9-40" class="">Avec le recul, cette décision est peut-être l&#x27;une des raisons pour lesquelles je peux aujourd&#x27;hui écrire ce livre sans avoir honte de la manière dont j&#x27;ai suivi son parcours.</p>
+<p id="p-9-41" class="">J&#x27;ai été enthousiaste.</p>
+<p id="p-9-42" class="">Parfois beaucoup.</p>
+<p id="p-9-43" class="">Peut-être trop pour les gens qui ne comprennent pas qu&#x27;on puisse avoir quarante-cinq ans et se réjouir d&#x27;un nouveau single comme un adolescent.</p>
+<p id="p-9-44" class="">Mais je suis resté respectueux.</p>
+<p id="p-9-45" class="">Et puis il y avait la musique que je créais moi-même.</p>
+<p id="p-9-46" class="">Là encore, Marine a servi de déclencheur plus que de modèle à copier.</p>
+<p id="p-9-47" class="">Je cherchais des émotions proches de ce que j&#x27;aimais chez elle : la sincérité, les mélodies accessibles, les mots simples qui peuvent toucher sans avoir besoin de faire compliqué.</p>
+<p id="p-9-48" class="">Je pouvais imaginer une chanson dans « son esprit », mais je ne voulais pas fabriquer une fausse Marine.</p>
+<p id="p-9-49" class="">Cette frontière était non négociable.</p>
+<p id="p-9-50" class="">Une voix appartient à la personne qui la porte.</p>
+<p id="p-9-51" class="">Mon hommage devait donc rester identifiable comme tel.</p>
+<p id="p-9-52" class="">Petit à petit, je me suis rendu compte que Marine avait provoqué quelque chose de plus large chez moi : elle m&#x27;avait redonné envie de créer autour de la musique.</p>
+<p id="p-9-53" class="">Pas seulement de commenter.</p>
+<p id="p-9-54" class="">Créer.</p>
+<p id="p-9-55" class="">Écrire.</p>
+<p id="p-9-56" class="">Monter.</p>
+<p id="p-9-57" class="">Imaginer.</p>
+<p id="p-9-58" class="">Partager.</p>
+<p id="p-9-59" class="">À ce stade, sa victoire n&#x27;était même plus le seul enjeu.</p>
+<p id="p-9-60" class="">Bien sûr que je voulais qu&#x27;elle gagne.</p>
+<p id="p-9-61" class="">Mais elle avait déjà gagné une place dans mon univers personnel.</p>
+<p id="p-9-62" class="">Ce qui est une phrase extrêmement dangereuse à écrire quand on porte le pseudo Le Grognard du Net.</p>
+<p id="p-9-63" class="">J&#x27;assume.</p>
+<p id="p-9-64" class="">À mesure que ma chaîne grandissait, je découvrais aussi la responsabilité minuscule mais réelle qui vient avec une audience.</p>
+<p id="p-9-65" class="">Quand dix personnes regardent une vidéo, on parle comme si l&#x27;on discutait autour d&#x27;une table.</p>
+<p id="p-9-66" class="">Quand elles deviennent des milliers, les mots voyagent plus loin que prévu.</p>
+<p id="p-9-67" class="">Une erreur se répète.</p>
+<p id="p-9-68" class="">Une rumeur peut être prise pour une information.</p>
+<p id="p-9-69" class="">Une formulation trop affirmative devient, quelques heures plus tard, « Le Grognard a dit que… »</p>
+<p id="p-9-70" class="">Cela m&#x27;a obligé à devenir plus sérieux sans perdre le ton qui faisait ma chaîne.</p>
+<p id="p-9-71" class="">Je pouvais continuer à plaisanter.</p>
+<p id="p-9-72" class="">Je pouvais continuer à être enthousiaste.</p>
+<p id="p-9-73" class="">Mais je devais vérifier davantage.</p>
+<p id="p-9-74" class="">C&#x27;est comme ça que je me suis retrouvé à constituer, sans vraiment l&#x27;avoir décidé, une sorte de chronologie de Marine.</p>
+<p id="p-9-75" class="">The Voice Kids.</p>
+<p id="p-9-76" class="">Les concours avant la Star Academy.</p>
+<p id="p-9-77" class="">« Ma faute ».</p>
+<p id="p-9-78" class="">L&#x27;entrée au château.</p>
+<p id="p-9-79" class="">Les évaluations.</p>
+<p id="p-9-80" class="">Les prestations marquantes.</p>
+<p id="p-9-81" class="">La demi-finale.</p>
+<p id="p-9-82" class="">La finale.</p>
+<p id="p-9-83" class="">Bollaert.</p>
+<p id="p-9-84" class="">La tournée.</p>
+<p id="p-9-85" class="">Le studio.</p>
+<p id="p-9-86" class="">Le premier album.</p>
+<p id="p-9-87" class="">À force de préparer mes vidéos, j&#x27;avais devant moi le squelette d&#x27;une histoire.</p>
+<p id="p-9-88" class="">Ce livre était déjà là, quelque part, sans que je le sache.</p>
+<p id="p-9-89" class="">Il existait en petits morceaux.</p>
+<p id="p-9-90" class="">Un short sur Bollaert.</p>
+<p id="p-9-91" class="">Une longue vidéo sur son parcours.</p>
+<p id="p-9-92" class="">Un hommage pour son anniversaire.</p>
+<p id="p-9-93" class="">Une publication au moment de la sortie de « Cœur maladroit ».</p>
+<p id="p-9-94" class="">Une vidéo où je demandais aux abonnés quel type de duo ils aimeraient entendre.</p>
+<p id="p-9-95" class="">Une autre autour d&#x27;un passage en studio avec Ycare.</p>
+<p id="p-9-96" class="">Même les contenus les plus légers avaient leur place. Les animaux, Disney, les petites réactions spontanées, les moments où Marine redevenait simplement cette fille capable de s&#x27;enthousiasmer pour quelque chose avec une énergie presque enfantine.</p>
+<p id="p-9-97" class="">Ce sont ces détails-là qui empêchent un portrait de devenir une fiche Wikipédia.</p>
+<p id="p-9-98" class="">Une carrière est faite de dates.</p>
+<p id="p-9-99" class="">Un attachement est fait de souvenirs.</p>
+<p id="p-9-100" class="">Sur ma chaîne, les deux commençaient à se mélanger.</p>
+<p id="p-9-101" class="">Je pouvais publier une information précise puis, juste après, un contenu beaucoup plus personnel : « Voilà pourquoi ce moment m&#x27;a touché. »</p>
+<p id="p-9-102" class="">C&#x27;était ça, mon angle.</p>
+<p id="p-9-103" class="">Pas être le premier.</p>
+<p id="p-9-104" class="">Être sincère.</p>
+<p id="p-9-105" class="">Internet pousse pourtant dans la direction opposée.</p>
+<p id="p-9-106" class="">Il faut publier vite.</p>
+<p id="p-9-107" class="">Être plus spectaculaire que les autres.</p>
+<p id="p-9-108" class="">Mettre un titre qui promet quelque chose d&#x27;énorme.</p>
+<p id="p-9-109" class="">« Marine choque tout le monde ! »</p>
+<p id="p-9-110" class="">« Ce qu&#x27;elle cache enfin révélé ! »</p>
+<p id="p-9-111" class="">« Personne ne s&#x27;attendait à ça ! »</p>
+<p id="p-9-112" class="">Parfois, la chose que « personne n&#x27;attendait » est simplement une photo avec un nouveau pull.</p>
+<p id="p-9-113" class="">Je caricature à peine.</p>
+<p id="p-9-114" class="">J&#x27;ai forcément utilisé des titres accrocheurs. C&#x27;est le jeu de YouTube. Une vidéo que personne ne clique ne peut pas transmettre grand-chose.</p>
+<p id="p-9-115" class="">Mais j&#x27;essayais de ne pas franchir cette ligne où le titre raconte autre chose que la vidéo.</p>
+<p id="p-9-116" class="">Et lorsque Marine faisait l&#x27;objet de ragots, je préférais généralement revenir à ce qui m&#x27;intéressait : sa musique.</p>
+<p id="p-9-117" class="">C&#x27;est aussi pour ça que les chansons de fan ont pris de l&#x27;importance.</p>
+<p id="p-9-118" class="">Créer « À Cœur Ouvert » ou d&#x27;autres titres inspirés de son aventure me permettait de transformer l&#x27;admiration en quelque chose qui m&#x27;appartenait.</p>
+<p id="p-9-119" class="">Je ne dépendais plus seulement de son actualité.</p>
+<p id="p-9-120" class="">Elle déclenchait une idée, puis l&#x27;idée devenait une création autonome.</p>
+<p id="p-9-121" class="">C&#x27;est une sensation très particulière.</p>
+<p id="p-9-122" class="">On commence par suivre un artiste.</p>
+<p id="p-9-123" class="">Puis l&#x27;artiste vous donne envie de produire vous-même.</p>
+<p id="p-9-124" class="">Le mouvement s&#x27;inverse.</p>
+<p id="p-9-125" class="">Je ne chantais pas avec la voix de Marine.</p>
+<p id="p-9-126" class="">Je ne cherchais pas à lui faire dire des choses.</p>
+<p id="p-9-127" class="">Je cherchais à écrire ce que moi, en tant que fan, j&#x27;avais envie de transmettre.</p>
+<p id="p-9-128" class="">Parfois une chanson pouvait parler de l&#x27;aventure Star Academy, de l&#x27;espoir, du fait d&#x27;oser. Parfois c&#x27;était simplement un clin d&#x27;œil à un univers musical que j&#x27;aimais.</p>
+<p id="p-9-129" class="">Et cette règle de respect me semblait encore plus importante avec les outils modernes.</p>
+<p id="p-9-130" class="">Aujourd&#x27;hui, il est techniquement possible de fabriquer presque n&#x27;importe quoi : une fausse voix, un faux duo, une image qui n&#x27;a jamais existé.</p>
+<p id="p-9-131" class="">La question n&#x27;est plus seulement « Est-ce que je peux ? »</p>
+<p id="p-9-132" class="">La vraie question est « Est-ce que je dois ? »</p>
+<p id="p-9-133" class="">Pour Marine, ma réponse a toujours été claire.</p>
+<p id="p-9-134" class="">Je pouvais imaginer.</p>
+<p id="p-9-135" class="">Je pouvais créer.</p>
+<p id="p-9-136" class="">Mais je devais signer mes créations pour ce qu&#x27;elles étaient.</p>
+<p id="p-9-137" class="">Des créations du Grognard.</p>
+<p id="p-9-138" class="">Pas des œuvres de Marine.</p>
+<p id="p-9-139" class="">C&#x27;est peut-être une petite chose, mais elle résume exactement la manière dont je voulais être fan : enthousiaste sans être trompeur.</p>
+<p id="p-9-140" class="">Au fil du temps, mon site a suivi la même évolution.</p>
+<p id="p-9-141" class="">Ce qui était au départ un espace pour mes contenus est devenu aussi un endroit où mes vidéos consacrées à la musique et à Marine pouvaient être retrouvées plus facilement. J&#x27;organisais, je mettais en avant, je reliais des projets.</p>
+<p id="p-9-142" class="">Et je réalisais que j&#x27;avais créé quelque chose que je n&#x27;aurais jamais imaginé en regardant le premier prime.</p>
+<p id="p-9-143" class="">Une partie de mon propre travail portait désormais la trace de cette rencontre à distance.</p>
+<p id="p-9-144" class="">Pas une rencontre personnelle.</p>
+<p id="p-9-145" class="">Une rencontre artistique.</p>
+<p id="p-9-146" class="">Et parfois, c&#x27;est largement suffisant pour changer une trajectoire créative.</p>
+</section>
+<section class="chapter" id="sec-10" data-section="10">
+<div class="chapter-head">
+<div class="chapter-kicker">CHAPITRE 9</div>
+<h1>« MAMAN, J&#x27;AI GAGNÉ »</h1></div>
+<p id="p-10-0" class="first-para">Avant cette finale, il y avait eu les demi-finales.</p>
+<p id="p-10-1" class="">Marine face à Charles.</p>
+<p id="p-10-2" class="">Puis Ebony face à Franck.</p>
+<p id="p-10-3" class="">À ce stade de la saison, chaque départ fait plus mal parce que les candidats ne sont plus seulement des noms dans une promotion. Nous les avons vus pendant des semaines. Nous connaissons leurs voix, leurs habitudes, leurs petites manies de télévision. Même quand on a un favori, on sait que la qualification de l&#x27;un signifie la fin de l&#x27;aventure pour quelqu&#x27;un qu&#x27;on a appris à apprécier.</p>
+<p id="p-10-4" class="">La demi-finale de Marine contre Charles avait donc une tension particulière pour moi.</p>
+<p id="p-10-5" class="">Je voulais qu&#x27;elle passe.</p>
+<p id="p-10-6" class="">Mais je ne voulais pas non plus réduire Charles à « celui qu&#x27;il faut éliminer ». Il avait progressé, gagné en assurance, construit lui aussi son histoire. C&#x27;est l&#x27;une des choses que la Star Academy réussit bien quand une saison fonctionne : elle rend les éliminations presque contradictoires. On veut un résultat et, lorsqu&#x27;il arrive, on ressent tout de même quelque chose pour celui qui part.</p>
+<p id="p-10-7" class="">Marine obtient sa place pour la finale.</p>
+<p id="p-10-8" class="">De l&#x27;autre côté, Ebony se qualifie face à Franck.</p>
+<p id="p-10-9" class="">Le dernier duel est donc fixé.</p>
+<p id="p-10-10" class="">Marine contre Ebony.</p>
+<p id="p-10-11" class="">Sur les réseaux, la machine s&#x27;emballe immédiatement.</p>
+<p id="p-10-12" class="">Les comparaisons deviennent permanentes.</p>
+<p id="p-10-13" class="">Qui chante le mieux ?</p>
+<p id="p-10-14" class="">Qui a le plus progressé ?</p>
+<p id="p-10-15" class="">Qui mérite la victoire ?</p>
+<p id="p-10-16" class="">Qui a le meilleur parcours ?</p>
+<p id="p-10-17" class="">Et, évidemment, certaines discussions dépassent largement la musique.</p>
+<p id="p-10-18" class="">C&#x27;est exactement le moment où j&#x27;ai essayé de rester fidèle à ma façon de suivre l&#x27;émission.</p>
+<p id="p-10-19" class="">Je pouvais être pour Marine sans devenir contre Ebony.</p>
+<p id="p-10-20" class="">C&#x27;est moins spectaculaire comme position, mais beaucoup plus agréable.</p>
+<p id="p-10-21" class="">Dans mes vidéos, je préférais revenir aux moments qui m&#x27;avaient fait choisir Marine : sa voix, son évolution, « Ma faute », son humour, cette impression qu&#x27;elle n&#x27;avait jamais complètement perdu le contact avec la fille qui ne savait pas encore si elle allait vraiment avoir une carrière dans la musique.</p>
+<p id="p-10-22" class="">La semaine de finale ressemble à une longue attente.</p>
+<p id="p-10-23" class="">Tout semble devenir symbolique.</p>
+<p id="p-10-24" class="">La dernière évaluation.</p>
+<p id="p-10-25" class="">Les anciens qui reviennent.</p>
+<p id="p-10-26" class="">Les messages des proches.</p>
+<p id="p-10-27" class="">Les répétitions où chaque candidat essaie de faire comme si la pression n&#x27;avait pas doublé.</p>
+<p id="p-10-28" class="">Et puis il y a cette sensation très particulière pour le téléspectateur : après des mois à regarder, il ne reste plus qu&#x27;une soirée.</p>
+<p id="p-10-29" class="">Je repensais alors au début.</p>
+<p id="p-10-30" class="">À « Ordinaire ».</p>
+<p id="p-10-31" class="">À la Marine qui venait d&#x27;entrer au château.</p>
+<p id="p-10-32" class="">À la jeune femme qui avait déjà une chanson en ligne mais pas encore de public comparable à celui qui l&#x27;attendait dehors.</p>
+<p id="p-10-33" class="">À celle qui avait douté suffisamment de fois pour rendre presque comique le fait qu&#x27;elle soit maintenant à une marche du trophée.</p>
+<p id="p-10-34" class="">On parle souvent du « parcours » dans les télécrochets comme d&#x27;un mot un peu automatique.</p>
+<p id="p-10-35" class="">Mais, dans son cas, je le voyais réellement.</p>
+<p id="p-10-36" class="">Elle n&#x27;était pas devenue une autre personne.</p>
+<p id="p-10-37" class="">Elle avait appris à occuper davantage de place.</p>
+<p id="p-10-38" class="">À faire confiance à sa voix.</p>
+<p id="p-10-39" class="">À accepter qu&#x27;on puisse l&#x27;attendre sur une grande chanson.</p>
+<p id="p-10-40" class="">À comprendre aussi que le public ne la suivait pas malgré ses maladresses mais parfois à cause d&#x27;elles.</p>
+<p id="p-10-41" class="">Quand la finale a commencé, tout cela était déjà là.</p>
+<p id="p-10-42" class="">La victoire pouvait ajouter un trophée.</p>
+<p id="p-10-43" class="">Elle ne pouvait plus effacer le chemin.</p>
+<p id="p-10-44" class="">Le 25 janvier 2025, Marine affronte Ebony en finale.</p>
+<p id="p-10-45" class="">Deux femmes.</p>
+<p id="p-10-46" class="">Deux artistes très différentes.</p>
+<p id="p-10-47" class="">Deux parcours qui ont porté la saison jusqu&#x27;au dernier soir.</p>
+<p id="p-10-48" class="">Je ne vais pas faire semblant d&#x27;avoir regardé cette finale avec la neutralité d&#x27;un huissier.</p>
+<p id="p-10-49" class="">Je voulais que Marine gagne.</p>
+<p id="p-10-50" class="">C&#x27;était devenu évident depuis longtemps.</p>
+<p id="p-10-51" class="">Mais je ne ressentais pas le besoin de transformer Ebony en adversaire à abattre. Elle avait sa voix, son identité, ses fans. Sa présence rendait la finale plus forte.</p>
+<p id="p-10-52" class="">C&#x27;est une chose que les guerres de supporters oublient parfois : si l&#x27;autre finaliste est excellent, votre candidat n&#x27;en ressort que davantage grandi.</p>
+<p id="p-10-53" class="">La soirée avance.</p>
+<p id="p-10-54" class="">Les prestations s&#x27;enchaînent.</p>
+<p id="p-10-55" class="">Le stress monte.</p>
+<p id="p-10-56" class="">Même à travers un écran, on perçoit ce mélange étrange des finales : les candidats doivent chanter alors qu&#x27;une partie de leur cerveau attend simplement qu&#x27;on prononce un prénom.</p>
+<p id="p-10-57" class="">Puis le moment arrive.</p>
+<p id="p-10-58" class="">Marine gagne avec 65 % des voix.</p>
+<p id="p-10-59" class="">Et sa première réaction devient immédiatement l&#x27;une de ces petites phrases qui collent à une histoire.</p>
+<p id="p-10-60" class="">« Maman, j&#x27;ai gagné ! »</p>
+<p id="p-10-61" class="">Pas une déclaration préparée.</p>
+<p id="p-10-62" class="">Pas un discours de victoire.</p>
+<p id="p-10-63" class="">Juste une fille qui appelle sa mère dans un moment où son cerveau semble avoir abandonné toute tentative de formulation sophistiquée.</p>
+<p id="p-10-64" class="">C&#x27;était elle.</p>
+<p id="p-10-65" class="">C&#x27;était exactement pour ça que tant de gens s&#x27;étaient attachés.</p>
+<p id="p-10-66" class="">Le trophée venait couronner une aventure télévisée, mais pour moi, il faisait surtout basculer l&#x27;histoire dans une nouvelle phase.</p>
+<p id="p-10-67" class="">Parce que gagner la Star Academy ne garantit rien.</p>
+<p id="p-10-68" class="">C&#x27;est un accélérateur.</p>
+<p id="p-10-69" class="">Un projecteur.</p>
+<p id="p-10-70" class="">Une chance immense.</p>
+<p id="p-10-71" class="">Mais le public est cruel avec les lendemains de victoire.</p>
+<p id="p-10-72" class="">Pendant trois mois, il vous regarde tous les soirs. Puis une nouvelle actualité arrive. Une nouvelle émission. Un nouveau visage.</p>
+<p id="p-10-73" class="">Le vrai défi commence lorsque le château ferme.</p>
+<p id="p-10-74" class="">Marine le savait.</p>
+<p id="p-10-75" class="">Dans ses interviews des jours suivants, elle parlait encore de ses doutes, de son envie de faire un album qui mélange plusieurs univers, de ses chansons déjà écrites, de son plan B dentaire qu&#x27;elle ne voulait pas totalement jeter à la poubelle.</p>
+<p id="p-10-76" class="">Cette prudence me plaisait.</p>
+<p id="p-10-77" class="">Elle venait de gagner devant des millions de téléspectateurs et continuait à parler comme quelqu&#x27;un qui savait que rien n&#x27;était acquis.</p>
+<p id="p-10-78" class="">Moi, de mon côté, j&#x27;étais ravi.</p>
+<p id="p-10-79" class="">Et un peu inquiet.</p>
+<p id="p-10-80" class="">Parce qu&#x27;une émission protège aussi les artistes. Elle leur fournit des chansons, une scène, une exposition énorme, un récit hebdomadaire.</p>
+<p id="p-10-81" class="">Après, il faut exister seul.</p>
+<p id="p-10-82" class="">Le public ne va plus voter pour sauver Marine.</p>
+<p id="p-10-83" class="">Il va choisir ou non d&#x27;écouter ses titres.</p>
+<p id="p-10-84" class="">Il va acheter ou non des places.</p>
+<p id="p-10-85" class="">Il va rester ou passer à autre chose.</p>
+<p id="p-10-86" class="">C&#x27;est là que mon regard de fan a commencé à devenir encore plus intéressant.</p>
+<p id="p-10-87" class="">Pendant la Star Academy, Marine faisait partie d&#x27;une histoire collective.</p>
+<p id="p-10-88" class="">Après la finale, il fallait découvrir l&#x27;artiste.</p>
+<p id="p-10-89" class="">La première étape était déjà là : « Ma faute ».</p>
+<p id="p-10-90" class="">La chanson, publiée bien avant l&#x27;émission, connaissait une nouvelle vie spectaculaire. Une version retravaillée sort. Le clip arrive. Le titre monte, s&#x27;installe et finit par obtenir des certifications que la jeune femme qui l&#x27;avait enregistrée avant le château aurait probablement eu du mal à imaginer.</p>
+<p id="p-10-91" class="">Quelques semaines plus tard, Bollaert.</p>
+<p id="p-10-92" class="">Puis la tournée Star Academy.</p>
+<p id="p-10-93" class="">Puis les studios.</p>
+<p id="p-10-94" class="">Puis les annonces.</p>
+<p id="p-10-95" class="">Chaque fois, j&#x27;avais de la matière pour mes vidéos.</p>
+<p id="p-10-96" class="">Mais surtout, chaque fois, j&#x27;avais cette impression étrange de voir une histoire continuer alors que, d&#x27;habitude, pour moi, la Star Academy se terminait presque avec la finale.</p>
+<p id="p-10-97" class="">Cette fois, je ne voulais pas fermer le livre.</p>
+<p id="p-10-98" class="">Je voulais le chapitre suivant.</p>
+<p id="p-10-99" class="">C&#x27;est peut-être à ce moment-là que j&#x27;ai vraiment compris la différence entre les autres saisons et celle de Marine.</p>
+<p id="p-10-100" class="">Pierre Garnier avait gagné l&#x27;année précédente et j&#x27;avais suivi son succès avec intérêt.</p>
+<p id="p-10-101" class="">Marine a gagné et j&#x27;ai eu envie de l&#x27;accompagner de loin dans la suite.</p>
+<p id="p-10-102" class="">Pas de la connaître.</p>
+<p id="p-10-103" class="">Pas d&#x27;entrer dans sa vie.</p>
+<p id="p-10-104" class="">Simplement d&#x27;être là, côté public.</p>
+<p id="p-10-105" class="">D&#x27;écouter.</p>
+<p id="p-10-106" class="">De raconter.</p>
+<p id="p-10-107" class="">De créer.</p>
+<p id="p-10-108" class="">Pour un fan, c&#x27;est déjà beaucoup.</p>
+</section>
+<section class="chapter" id="sec-11" data-section="11">
+<div class="chapter-head">
+<div class="chapter-kicker">CHAPITRE 10</div>
+<h1>APRÈS LA FINALE, TOUT COMMENCE</h1></div>
+<p id="p-11-0" class="first-para">Les mois qui suivent la victoire vont vite.</p>
+<p id="p-11-1" class="">Très vite.</p>
+<p id="p-11-2" class="">Marine passe de la vie au château à une tournée médiatique, puis à la tournée Star Academy. Elle enchaîne les scènes avec les autres académiciens. Elle découvre le rythme de l&#x27;après : les interviews, les studios, les déplacements, les répétitions, les fans qui l&#x27;attendent désormais ailleurs que derrière un écran.</p>
+<p id="p-11-3" class="">Pendant ce temps, « Ma faute » poursuit sa trajectoire.</p>
+<p id="p-11-4" class="">Ce qui me plaît dans ce succès, c&#x27;est son ordre chronologique.</p>
+<p id="p-11-5" class="">La chanson existait avant la célébrité.</p>
+<p id="p-11-6" class="">La célébrité n&#x27;a pas créé le morceau ; elle l&#x27;a fait entendre.</p>
+<p id="p-11-7" class="">En 2025, le titre devient un vrai succès, jusqu&#x27;à être certifié diamant en France à la fin de l&#x27;année. C&#x27;est vertigineux quand on repense à sa naissance discrète quelques années plus tôt.</p>
+<p id="p-11-8" class="">Puis arrive « Cœur maladroit ».</p>
+<p id="p-11-9" class="">Rien que le titre me semble parfaitement choisi pour Marine.</p>
+<p id="p-11-10" class="">Il y a cette idée d&#x27;émotion assumée, mais jamais parfaitement rangée. Quelque chose de tendre, d&#x27;un peu bancal, de très humain.</p>
+<p id="p-11-11" class="">Le morceau annonce un premier album qui sort le 27 juin 2025 chez Columbia/Sony Music.</p>
+<p id="p-11-12" class="">Treize titres.</p>
+<p id="p-11-13" class="">Et, surtout, la nécessité de répondre à la grande question : qui est Marine lorsqu&#x27;elle ne chante plus les chansons choisies pour elle par la Star Academy ?</p>
+<p id="p-11-14" class="">L&#x27;album donne une première réponse.</p>
+<p id="p-11-15" class="">« Fille ordinaire » ouvre le disque. « Cœur maladroit » installe une pop immédiatement accessible. « Ma faute » revient dans une nouvelle version. D&#x27;autres titres explorent des zones plus intimes, plus légères ou plus mélancoliques.</p>
+<p id="p-11-16" class="">Je n&#x27;ai pas besoin d&#x27;aimer chaque chanson de la même manière pour comprendre l&#x27;ensemble.</p>
+<p id="p-11-17" class="">Ce que j&#x27;entends, c&#x27;est une artiste qui refuse de choisir entre la grande variété qu&#x27;elle aime et une pop plus actuelle.</p>
+<p id="p-11-18" class="">Elle travaille avec différents auteurs, compositeurs et producteurs. Eddy de Pretto participe notamment à l&#x27;écriture de « Fille ordinaire ». Marine signe ou cosigne plusieurs morceaux.</p>
+<p id="p-11-19" class="">C&#x27;est important.</p>
+<p id="p-11-20" class="">Parce que le mot « gagnante de la Star Academy » peut être un tremplin mais aussi une étiquette collante.</p>
+<p id="p-11-21" class="">Pour sortir de l&#x27;émission, il faut que le public commence à dire simplement « Marine ».</p>
+<p id="p-11-22" class="">Pas « Marine de la Star Ac ».</p>
+<p id="p-11-23" class="">Marine.</p>
+<p id="p-11-24" class="">À l&#x27;été 2025, j&#x27;ai consacré beaucoup de contenu à cette nouvelle phase.</p>
+<p id="p-11-25" class="">Je voulais parler de l&#x27;album, de ses morceaux, de ce que cela révélait de son univers. Je préparais des vidéos sur les raisons pour lesquelles le public s&#x27;attachait à elle. Je suivais les clips, les interviews, les petites anecdotes.</p>
+<p id="p-11-26" class="">Et toujours cette même règle : les ragots, non.</p>
+<p id="p-11-27" class="">Le travail, oui.</p>
+<p id="p-11-28" class="">La musique, oui.</p>
+<p id="p-11-29" class="">Les déclarations publiques, oui.</p>
+<p id="p-11-30" class="">Les inventions sur sa vie privée, non.</p>
+<p id="p-11-31" class="">C&#x27;est moins spectaculaire.</p>
+<p id="p-11-32" class="">C&#x27;est aussi beaucoup plus confortable pour dormir.</p>
+<p id="p-11-33" class="">À l&#x27;automne, la carrière continue d&#x27;accélérer.</p>
+<p id="p-11-34" class="">L&#x27;album aura droit à une édition deluxe en décembre 2025, enrichie de nouveaux titres. « Cœur maladroit » sera certifié or en single. L&#x27;album, lui, atteindra le platine en janvier 2026, environ six mois après sa sortie.</p>
+<p id="p-11-35" class="">« Ma faute » devient diamant.</p>
+<p id="p-11-36" class="">Sur le papier, ce sont des certifications.</p>
+<p id="p-11-37" class="">Pour moi, elles ont surtout une signification : le public n&#x27;est pas parti après la finale.</p>
+<p id="p-11-38" class="">C&#x27;est probablement la peur silencieuse de tous les gagnants de télé-crochets.</p>
+<p id="p-11-39" class="">Et après ?</p>
+<p id="p-11-40" class="">Après, dans le cas de Marine, il y a eu des disques vendus, des millions d&#x27;écoutes, des salles, une tournée solo.</p>
+<p id="p-11-41" class="">Il y a eu aussi ce moment que j&#x27;attendais depuis que tout avait commencé.</p>
+<p id="p-11-42" class="">Le passage de l&#x27;écran à la scène.</p>
+<p id="p-11-43" class="">Montpellier.</p>
+<p id="p-11-44" class="">Jusque-là, Marine avait été un visage sur mes écrans, une voix dans mes écouteurs, un sujet de vidéos, une artiste que je suivais à distance.</p>
+<p id="p-11-45" class="">Et soudain, elle allait être dans la même salle que moi.</p>
+<p id="p-11-46" class="">Je sais que cela paraît banal pour quelqu&#x27;un qui va régulièrement à des concerts.</p>
+<p id="p-11-47" class="">Pour moi, ça ne l&#x27;était pas.</p>
+<p id="p-11-48" class="">Parce que j&#x27;avais passé des mois à raconter son histoire.</p>
+<p id="p-11-49" class="">Et que, pour la première fois, je n&#x27;allais plus regarder à travers une caméra de télévision.</p>
+<p id="p-11-50" class="">Enfin… pas uniquement.</p>
+<p id="p-11-51" class="">Le Grognard reste un créateur de vidéos.</p>
+<p id="p-11-52" class="">Il ne faut pas demander des miracles.</p>
+<p id="p-11-53" class="">J&#x27;ai aussi appris à écouter l&#x27;album autrement que comme un fan de télévision.</p>
+<p id="p-11-54" class="">C&#x27;est une étape importante.</p>
+<p id="p-11-55" class="">Au château, une chanson est un exercice autant qu&#x27;une interprétation. Elle peut être choisie pour tester une voix, provoquer une émotion, créer un tableau ou fabriquer un moment de prime.</p>
+<p id="p-11-56" class="">Sur un album, l&#x27;artiste porte la responsabilité de l&#x27;ensemble.</p>
+<p id="p-11-57" class="">On peut aimer ou non, mais cette fois le disque parle en son nom.</p>
+<p id="p-11-58" class="">« Cœur maladroit » m&#x27;a donc intéressé pour ce qu&#x27;il disait de la direction choisie.</p>
+<p id="p-11-59" class="">« Fille ordinaire » était presque un manifeste tranquille. Pas besoin d&#x27;arriver avec une chanson qui annonce « Regardez comme je suis devenue une star ». Le titre rappelait au contraire quelque chose de son image : la fille du Nord qui se retrouve dans une situation extraordinaire sans vouloir jouer à la célébrité permanente.</p>
+<p id="p-11-60" class="">Le morceau titre, lui, possède cette efficacité pop qui correspond assez bien au contraste Marine : une mélodie facile à retenir et, dessous, quelque chose de moins lisse.</p>
+<p id="p-11-61" class="">« Des gens bien », « M&#x27;aimer tout le temps », « Dalida », « Ce qu&#x27;il nous reste », « Que ça dure », « Restes d&#x27;averses », « Rappelle-toi », « D&#x27;accord », « Gemme », « À la maison » : chaque morceau ajoutait une petite pièce.</p>
+<p id="p-11-62" class="">Je ne voulais pas faire ce que font parfois les fans les plus enthousiastes : déclarer que chaque piste était un chef-d&#x27;œuvre absolu qui allait révolutionner la musique française.</p>
+<p id="p-11-63" class="">Ce n&#x27;est pas nécessaire.</p>
+<p id="p-11-64" class="">Un premier album a aussi le droit d&#x27;être un début.</p>
+<p id="p-11-65" class="">Il a le droit de chercher.</p>
+<p id="p-11-66" class="">Il a le droit de contenir des chansons qui toucheront certains plus que d&#x27;autres.</p>
+<p id="p-11-67" class="">Ce qui comptait à mes yeux, c&#x27;était qu&#x27;on puisse reconnaître une direction et une personnalité.</p>
+<p id="p-11-68" class="">La réédition deluxe de décembre 2025 a encore élargi cet univers avec plusieurs titres supplémentaires. Les collaborations ont montré que Marine commençait aussi à travailler avec des auteurs et compositeurs déjà bien installés dans la chanson française.</p>
+<p id="p-11-69" class="">Et puis les chiffres sont arrivés.</p>
+<p id="p-11-70" class="">Je me méfie des chiffres, alors même que je passe une partie de ma vie de créateur à les regarder.</p>
+<p id="p-11-71" class="">Ils sont utiles.</p>
+<p id="p-11-72" class="">Ils ne disent pas tout.</p>
+<p id="p-11-73" class="">Un million de vues ne prouve pas qu&#x27;une chanson est meilleure qu&#x27;une autre. Un disque de platine ne mesure pas l&#x27;intensité avec laquelle quelqu&#x27;un écoute un morceau seul dans sa voiture.</p>
+<p id="p-11-74" class="">Mais les chiffres disent tout de même une chose importante : des gens sont là.</p>
+<p id="p-11-75" class="">Beaucoup de gens.</p>
+<p id="p-11-76" class="">Lorsque le SNEP a certifié « Ma faute » diamant en décembre 2025 puis « Cœur maladroit » platine en janvier 2026, j&#x27;ai ressenti une satisfaction presque absurde.</p>
+<p id="p-11-77" class="">Je n&#x27;avais évidemment rien composé.</p>
+<p id="p-11-78" class="">Je n&#x27;avais rien produit.</p>
+<p id="p-11-79" class="">Je n&#x27;avais pas passé une seule nuit en studio.</p>
+<p id="p-11-80" class="">Et pourtant j&#x27;étais content.</p>
+<p id="p-11-81" class="">C&#x27;est le fameux illogisme du fan.</p>
+<p id="p-11-82" class="">Nous sommes fiers d&#x27;un travail qui n&#x27;est pas le nôtre.</p>
+<p id="p-11-83" class="">La seule chose que nous avons faite, c&#x27;est écouter.</p>
+<p id="p-11-84" class="">Et parfois acheter une place.</p>
+<p id="p-11-85" class="">Mais cette fidélité du public répondait à la question qui me préoccupait depuis la finale : est-ce que les gens resteraient ?</p>
+<p id="p-11-86" class="">Ils restaient.</p>
+<p id="p-11-87" class="">Mieux : de nouveaux auditeurs arrivaient qui n&#x27;avaient peut-être même pas regardé la Star Academy.</p>
+<p id="p-11-88" class="">C&#x27;est là qu&#x27;une carrière change vraiment de statut.</p>
+<p id="p-11-89" class="">Quand quelqu&#x27;un entend « Cœur maladroit » à la radio et l&#x27;aime sans savoir qui a gagné quoi l&#x27;année précédente.</p>
+<p id="p-11-90" class="">Quand une chanson devient plus célèbre que l&#x27;émission qui l&#x27;a aidée à décoller.</p>
+<p id="p-11-91" class="">Quand des billets se vendent parce que le nom « Marine » suffit.</p>
+<p id="p-11-92" class="">Moi, j&#x27;étais arrivé par la télévision.</p>
+<p id="p-11-93" class="">D&#x27;autres arriveraient par la musique.</p>
+<p id="p-11-94" class="">Et je trouvais ça très bien.</p>
+<p id="p-11-95" class="">Parce qu&#x27;un artiste ne peut pas vivre éternellement uniquement de la nostalgie de sa victoire.</p>
+<p id="p-11-96" class="">Il faut que le public oublie peu à peu le trophée et garde les chansons.</p>
+<p id="p-11-97" class="">C&#x27;est peut-être le plus beau compliment que l&#x27;on puisse faire à quelqu&#x27;un sorti d&#x27;un télé-crochet.</p>
+</section>
+<section class="chapter" id="sec-12" data-section="12">
+<div class="chapter-head">
+<div class="chapter-kicker">CHAPITRE 11</div>
+<h1>MONTPELLIER : DE L&#x27;ÉCRAN À LA SCÈNE</h1></div>
+<p id="p-12-0" class="first-para">Le 7 décembre 2025, Marine se produit au Corum de Montpellier, dans la salle Berlioz, dans le cadre de sa première tournée solo.</p>
+<p id="p-12-1" class="">Pour moi, la date était entourée depuis longtemps.</p>
+<p id="p-12-2" class="">Pas seulement parce que j&#x27;allais à un concert.</p>
+<p id="p-12-3" class="">Parce que c&#x27;était son concert.</p>
+<p id="p-12-4" class="">Pendant des mois, je l&#x27;avais regardée à travers des écrans de toutes tailles : télévision, téléphone, ordinateur. J&#x27;avais monté ses images, préparé des titres, choisi des extraits, répondu à des commentaires. J&#x27;avais entendu sa voix compressée par la télévision, le streaming, les réseaux sociaux.</p>
+<p id="p-12-5" class="">Une salle de concert enlève cette distance.</p>
+<p id="p-12-6" class="">Quand les lumières s&#x27;éteignent, il n&#x27;y a plus de bouton pause.</p>
+<p id="p-12-7" class="">Plus de montage.</p>
+<p id="p-12-8" class="">Plus de miniature.</p>
+<p id="p-12-9" class="">Il reste la scène.</p>
+<p id="p-12-10" class="">Et le public.</p>
+<p id="p-12-11" class="">Je me souviens surtout de l&#x27;attente.</p>
+<p id="p-12-12" class="">C&#x27;est une partie du concert que les vidéos ne montrent jamais vraiment : les conversations autour de vous, les gens qui se retournent à chaque mouvement de lumière, les téléphones qui apparaissent dès qu&#x27;une musique change, l&#x27;impression collective que « ça va commencer » pendant parfois beaucoup trop longtemps.</p>
+<p id="p-12-13" class="">Puis Marine arrive.</p>
+<p id="p-12-14" class="">Et là, quelque chose de très simple se produit.</p>
+<p id="p-12-15" class="">Elle existe en trois dimensions.</p>
+<p id="p-12-16" class="">Cette phrase a l&#x27;air idiote, mais tous ceux qui ont longtemps suivi un artiste uniquement à travers les médias connaissent cette sensation. On sait évidemment que la personne est réelle. On n&#x27;est pas fou.</p>
+<p id="p-12-17" class="">Mais la voir occuper physiquement une scène, entendre la voix traverser la salle, sentir les réactions autour de soi, ça change l&#x27;échelle.</p>
+<p id="p-12-18" class="">Je filme quelques instants.</p>
+<p id="p-12-19" class="">Évidemment.</p>
+<p id="p-12-20" class="">Le Grognard n&#x27;allait pas soudainement découvrir la méditation pleine conscience.</p>
+<p id="p-12-21" class="">J&#x27;ai notamment gardé des images de son arrivée sur scène et de « Cœur maladroit » en live. Ces vidéos sont devenues, elles aussi, une partie de mon histoire de fan.</p>
+<p id="p-12-22" class="">Mais j&#x27;ai essayé de ne pas vivre tout le concert à travers mon téléphone.</p>
+<p id="p-12-23" class="">Il faut parfois accepter de ne pas tout archiver.</p>
+<p id="p-12-24" class="">Sinon on finit avec quatre-vingt-dix minutes de vidéo et aucun souvenir réel.</p>
+<p id="p-12-25" class="">Sur scène, je retrouve ce qui m&#x27;avait plu au château, mais transformé.</p>
+<p id="p-12-26" class="">L&#x27;humour est toujours là.</p>
+<p id="p-12-27" class="">La spontanéité aussi.</p>
+<p id="p-12-28" class="">La puissance vocale, évidemment.</p>
+<p id="p-12-29" class="">Mais ce n&#x27;est plus une candidate qui doit prouver quelque chose aux professeurs ou attendre les votes du public.</p>
+<p id="p-12-30" class="">C&#x27;est son spectacle.</p>
+<p id="p-12-31" class="">Ses chansons.</p>
+<p id="p-12-32" class="">Son univers.</p>
+<p id="p-12-33" class="">Cette différence est immense.</p>
+<p id="p-12-34" class="">Pendant la Star Academy, même lorsqu&#x27;un candidat est au centre d&#x27;un tableau, il habite un décor qui ne lui appartient pas.</p>
+<p id="p-12-35" class="">En tournée solo, tout est une déclaration : l&#x27;ordre des titres, les arrangements, les lumières, les moments parlés, les silences.</p>
+<p id="p-12-36" class="">Je regardais Marine et je pensais au chemin parcouru en un peu plus d&#x27;un an.</p>
+<p id="p-12-37" class="">Octobre 2024 : une candidate entre sur un plateau et chante « Ordinaire ».</p>
+<p id="p-12-38" class="">Décembre 2025 : des centaines puis des milliers de personnes ont acheté un billet uniquement pour elle.</p>
+<p id="p-12-39" class="">Entre les deux, un château, une victoire, une tournée collective, un album, des certifications, des heures de studio et probablement une quantité de sommeil beaucoup trop faible.</p>
+<p id="p-12-40" class="">J&#x27;avais suivi presque chaque étape publique.</p>
+<p id="p-12-41" class="">Et pourtant, la scène réussissait encore à me surprendre.</p>
+<p id="p-12-42" class="">Parce qu&#x27;une vidéo ne transmet jamais exactement une voix.</p>
+<p id="p-12-43" class="">Elle transmet une reproduction.</p>
+<p id="p-12-44" class="">Dans la salle, les graves existent dans le corps. Les grandes notes prennent de l&#x27;espace. Les défauts éventuels aussi, et c&#x27;est très bien : le live est vivant précisément parce qu&#x27;il n&#x27;est pas un fichier audio parfaitement nettoyé.</p>
+<p id="p-12-45" class="">Ce soir-là, je n&#x27;avais pas besoin de rencontrer Marine pour que le moment compte.</p>
+<p id="p-12-46" class="">Je n&#x27;avais pas besoin d&#x27;une photo bras dessus bras dessous ou d&#x27;une conversation inventée après coup.</p>
+<p id="p-12-47" class="">J&#x27;avais attendu de la voir sur scène.</p>
+<p id="p-12-48" class="">Je la voyais.</p>
+<p id="p-12-49" class="">C&#x27;était suffisant.</p>
+<p id="p-12-50" class="">Et cette idée est importante pour moi, surtout dans un livre de fan.</p>
+<p id="p-12-51" class="">Nous confondons parfois proximité et possession.</p>
+<p id="p-12-52" class="">Parce qu&#x27;un artiste répond à un commentaire, signe un autographe ou apparaît quelques secondes à côté de nous, on peut avoir l&#x27;impression qu&#x27;un lien personnel s&#x27;est créé.</p>
+<p id="p-12-53" class="">Parfois oui.</p>
+<p id="p-12-54" class="">Souvent non.</p>
+<p id="p-12-55" class="">Et ce n&#x27;est pas grave.</p>
+<p id="p-12-56" class="">Marine ne me devait rien.</p>
+<p id="p-12-57" class="">Je n&#x27;avais pas besoin qu&#x27;elle sache qui j&#x27;étais pour que ce qu&#x27;elle avait déclenché chez moi soit réel.</p>
+<p id="p-12-58" class="">Mes vidéos étaient réelles.</p>
+<p id="p-12-59" class="">Mes chansons de fan étaient réelles.</p>
+<p id="p-12-60" class="">Le site que j&#x27;avais développé autour de mes contenus était réel.</p>
+<p id="p-12-61" class="">Le billet dans ma poche était réel.</p>
+<p id="p-12-62" class="">L&#x27;émotion dans la salle aussi.</p>
+<p id="p-12-63" class="">C&#x27;est peut-être ça, finalement, le passage de l&#x27;écran à la scène.</p>
+<p id="p-12-64" class="">Pas devenir proche de l&#x27;artiste.</p>
+<p id="p-12-65" class="">Réaliser que ce que l&#x27;on suivait à distance a suffisamment compté pour nous faire nous déplacer, attendre, écouter et rentrer chez nous avec quelques chansons qui sonnent différemment qu&#x27;avant.</p>
+<p id="p-12-66" class="">Après Montpellier, je n&#x27;étais pas « encore plus propriétaire » de mon statut de fan.</p>
+<p id="p-12-67" class="">J&#x27;étais simplement heureux.</p>
+<p id="p-12-68" class="">Et c&#x27;était largement assez.</p>
+</section>
+<section class="chapter" id="sec-13" data-section="13">
+<div class="chapter-head">
+<div class="chapter-kicker">CHAPITRE 12</div>
+<h1>MARINE APRÈS MARINE</h1></div>
+<p id="p-13-0" class="first-para">Il y a un moment que tous les artistes issus d&#x27;une émission doivent affronter.</p>
+<p id="p-13-1" class="">Le jour où le public cesse de comparer chaque nouveau pas au programme qui les a révélés.</p>
+<p id="p-13-2" class="">Pour Marine, ce passage s&#x27;est fait progressivement.</p>
+<p id="p-13-3" class="">En 2025, elle était encore partout présentée comme « la gagnante de la Star Academy ».</p>
+<p id="p-13-4" class="">C&#x27;était logique.</p>
+<p id="p-13-5" class="">En 2026, autre chose s&#x27;est installé.</p>
+<p id="p-13-6" class="">L&#x27;album « Cœur maladroit » a été certifié platine en janvier. « Ma faute » était déjà devenue diamant. La tournée solo s&#x27;est prolongée, avec de nouvelles dates ajoutées jusque dans 2027. Marine n&#x27;était plus en train d&#x27;essayer de prouver qu&#x27;elle pouvait exister après l&#x27;émission.</p>
+<p id="p-13-7" class="">Elle existait.</p>
+<p id="p-13-8" class="">L&#x27;année 2026 a continué d&#x27;ajouter des morceaux à cette identité.</p>
+<p id="p-13-9" class="">« Escroc », présent dans l&#x27;édition deluxe, a poursuivi sa vie en single. Elle a aussi participé au titre « On m&#x27;avait dit » avec Félix Radu au printemps.</p>
+<p id="p-13-10" class="">Puis, le 4 septembre 2026, un nouveau single est arrivé : « Tricheur ».</p>
+<p id="p-13-11" class="">Au moment où j&#x27;écris ces lignes, il est encore récent.</p>
+<p id="p-13-12" class="">C&#x27;est aussi pour cela que je ne veux pas terminer ce livre comme on referme une biographie achevée.</p>
+<p id="p-13-13" class="">Marine a vingt-six ans.</p>
+<p id="p-13-14" class="">Son histoire professionnelle commence à peine.</p>
+<p id="p-13-15" class="">Elle a déjà connu plus de choses en deux ans que beaucoup de gens en dix : une émission nationale, une victoire, des tournées, un album platine, des singles certifiés, des scènes de plus en plus grandes.</p>
+<p id="p-13-16" class="">Mais la partie la plus intéressante reste peut-être devant elle.</p>
+<p id="p-13-17" class="">Que fera-t-elle lorsqu&#x27;elle n&#x27;aura plus du tout besoin de l&#x27;étiquette Star Academy ?</p>
+<p id="p-13-18" class="">Quelles chansons gardera-t-elle dans dix ans ?</p>
+<p id="p-13-19" class="">Lesquelles regardera-t-elle avec tendresse en disant qu&#x27;elle était encore en train de chercher ?</p>
+<p id="p-13-20" class="">Quel public restera ?</p>
+<p id="p-13-21" class="">Je n&#x27;en sais rien.</p>
+<p id="p-13-22" class="">Et c&#x27;est précisément ce qui me plaît.</p>
+<p id="p-13-23" class="">Être fan n&#x27;est pas connaître la fin.</p>
+<p id="p-13-24" class="">C&#x27;est avoir envie de voir la suite.</p>
+<p id="p-13-25" class="">De mon côté, Marine a déjà laissé une trace qui ne dépend pas de son prochain classement.</p>
+<p id="p-13-26" class="">Elle a changé ma manière de créer du contenu.</p>
+<p id="p-13-27" class="">Elle m&#x27;a donné envie de faire des vidéos plus longues, plus racontées, moins obsédées par la simple actualité.</p>
+<p id="p-13-28" class="">Elle m&#x27;a poussé à travailler des chansons-hommages sans copier, à réfléchir à la frontière entre inspiration et imitation.</p>
+<p id="p-13-29" class="">Elle a pris une place sur mon site, dans mes montages, dans mes projets.</p>
+<p id="p-13-30" class="">Et, surtout, elle m&#x27;a rappelé quelque chose que j&#x27;avais un peu oublié : on peut encore être surpris par un artiste.</p>
+<p id="p-13-31" class="">Même après quarante ans.</p>
+<p id="p-13-32" class="">Même après avoir vu des dizaines de saisons de télé-crochets.</p>
+<p id="p-13-33" class="">Même lorsqu&#x27;on croit connaître toutes les mécaniques.</p>
+<p id="p-13-34" class="">La surprise ne vient pas forcément d&#x27;une note que personne d&#x27;autre ne peut chanter.</p>
+<p id="p-13-35" class="">Elle peut venir d&#x27;un ensemble beaucoup plus fragile.</p>
+<p id="p-13-36" class="">Une voix.</p>
+<p id="p-13-37" class="">Un rire.</p>
+<p id="p-13-38" class="">Une façon de douter.</p>
+<p id="p-13-39" class="">Une chanson écrite avant que le succès arrive.</p>
+<p id="p-13-40" class="">Une imitation de train parfaitement inutile.</p>
+<p id="p-13-41" class="">Une phrase lancée à sa mère au moment de gagner.</p>
+<p id="p-13-42" class="">Une salle de concert à Montpellier.</p>
+<p id="p-13-43" class="">Et l&#x27;impression, au milieu de tout ça, qu&#x27;une artiste n&#x27;essaie pas trop fort de devenir quelqu&#x27;un d&#x27;autre.</p>
+<p id="p-13-44" class="">C&#x27;est peut-être le mot qui résume le mieux ce que j&#x27;aime chez Marine : sincérité.</p>
+<p id="p-13-45" class="">Pas une sincérité parfaite, parce que personne n&#x27;est transparent en permanence. Marine a son image publique, son métier, ses choix de communication, comme tous les artistes.</p>
+<p id="p-13-46" class="">Mais quelque chose passe.</p>
+<p id="p-13-47" class="">Une maladresse parfois.</p>
+<p id="p-13-48" class="">Un rire qui arrive trop tôt.</p>
+<p id="p-13-49" class="">Une émotion qu&#x27;on voit avant qu&#x27;elle ait eu le temps de la cacher.</p>
+<p id="p-13-50" class="">C&#x27;est cette impression qui m&#x27;a accroché.</p>
+<p id="p-13-51" class="">Et je crois que c&#x27;est aussi ce que j&#x27;ai essayé de préserver dans mes propres créations autour d&#x27;elle.</p>
+<p id="p-13-52" class="">Ne jamais la transformer en statue.</p>
+<p id="p-13-53" class="">Une statue ne doute pas.</p>
+<p id="p-13-54" class="">Une statue ne se trompe pas.</p>
+<p id="p-13-55" class="">Une statue ne fait pas le klaxon du TGV.</p>
+<p id="p-13-56" class="">Marine, si.</p>
+<p id="p-13-57" class="">Heureusement.</p>
+<p id="p-13-58" class="">Il y a enfin une dimension dont je ne parle pas assez : ce que cette histoire dit de moi.</p>
+<p id="p-13-59" class="">C&#x27;est pourtant la seule partie sur laquelle je peux être absolument certain.</p>
+<p id="p-13-60" class="">Je ne sais pas ce que Marine ressent lorsqu&#x27;une salle reprend ses chansons.</p>
+<p id="p-13-61" class="">Je ne sais pas ce qu&#x27;elle pense quand elle voit un montage fait par un fan.</p>
+<p id="p-13-62" class="">Je ne sais pas si elle a déjà croisé l&#x27;une de mes vidéos et, si c&#x27;est le cas, si elle a regardé dix secondes ou jusqu&#x27;à la fin.</p>
+<p id="p-13-63" class="">Mais je sais ce que moi j&#x27;ai ressenti.</p>
+<p id="p-13-64" class="">Au début, j&#x27;avais presque tendance à justifier mon enthousiasme.</p>
+<p id="p-13-65" class="">Parce que j&#x27;ai quarante-cinq ans.</p>
+<p id="p-13-66" class="">Parce qu&#x27;il existe cette idée un peu bête selon laquelle, passé un certain âge, il faudrait devenir raisonnable jusque dans ce que l&#x27;on aime.</p>
+<p id="p-13-67" class="">On aurait le droit d&#x27;être passionné par le vin, une voiture ancienne, le bricolage ou le football. Mais dire qu&#x27;une chanteuse révélée par la Star Academy vous touche énormément, cela provoquerait parfois ce petit sourire amusé : « Ah oui, quand même. »</p>
+<p id="p-13-68" class="">Eh bien oui.</p>
+<p id="p-13-69" class="">Quand même.</p>
+<p id="p-13-70" class="">Pourquoi faudrait-il une date de péremption à l&#x27;enthousiasme ?</p>
+<p id="p-13-71" class="">Je n&#x27;ai pas quinze ans.</p>
+<p id="p-13-72" class="">Je ne confonds pas une artiste et une amie.</p>
+<p id="p-13-73" class="">Je ne construis pas ma vie autour de l&#x27;espoir qu&#x27;elle me remarque.</p>
+<p id="p-13-74" class="">Je sais parfaitement que Marine ne chante pas pour moi personnellement.</p>
+<p id="p-13-75" class="">Tout cela n&#x27;empêche pas une voix de provoquer quelque chose.</p>
+<p id="p-13-76" class="">Au contraire, peut-être qu&#x27;à quarante-cinq ans on comprend mieux la valeur des choses qui réussissent encore à nous surprendre.</p>
+<p id="p-13-77" class="">Nous accumulons des habitudes.</p>
+<p id="p-13-78" class="">Nous avons déjà entendu des milliers de chansons.</p>
+<p id="p-13-79" class="">Nous connaissons les ficelles des émissions.</p>
+<p id="p-13-80" class="">Nous savons qu&#x27;une finale est montée pour créer du suspense, qu&#x27;une interview est préparée, qu&#x27;un clip est une production, qu&#x27;une carrière est aussi une industrie.</p>
+<p id="p-13-81" class="">Et malgré cette connaissance, parfois l&#x27;émotion passe quand même.</p>
+<p id="p-13-82" class="">C&#x27;est ça qui est beau.</p>
+<p id="p-13-83" class="">Marine n&#x27;a pas effacé mon esprit critique.</p>
+<p id="p-13-84" class="">Elle l&#x27;a traversé.</p>
+<p id="p-13-85" class="">Je peux savoir comment fonctionne la télévision et être touché par une prestation.</p>
+<p id="p-13-86" class="">Je peux connaître les stratégies de communication et trouver une interview drôle.</p>
+<p id="p-13-87" class="">Je peux comprendre qu&#x27;un concert est un spectacle parfaitement préparé et avoir des frissons quand les lumières s&#x27;éteignent.</p>
+<p id="p-13-88" class="">La lucidité et l&#x27;émotion ne sont pas ennemies.</p>
+<p id="p-13-89" class="">Elles peuvent très bien s&#x27;asseoir côte à côte.</p>
+<p id="p-13-90" class="">C&#x27;est d&#x27;ailleurs ce que j&#x27;aimerais que ce livre transmette.</p>
+<p id="p-13-91" class="">Il ne faut pas être naïf pour être fan.</p>
+<p id="p-13-92" class="">Il suffit d&#x27;accepter qu&#x27;une partie de nous n&#x27;a pas besoin de tout mesurer.</p>
+<p id="p-13-93" class="">Cette aventure a aussi accompagné une transformation de mon travail de créateur.</p>
+<p id="p-13-94" class="">Quand j&#x27;ai lancé Le Grognard du Net, je testais beaucoup de choses. La chaîne était un terrain de jeu. Je pouvais passer d&#x27;un sujet à un autre, chercher ce qui plaisait, apprendre le montage, comprendre les titres, les miniatures, la durée d&#x27;attention.</p>
+<p id="p-13-95" class="">Avec Marine, j&#x27;ai commencé à penser davantage en histoires.</p>
+<p id="p-13-96" class="">Une vidéo n&#x27;était plus seulement « une information + une réaction ».</p>
+<p id="p-13-97" class="">Elle pouvait avoir un début, une attente, un souvenir, une conclusion.</p>
+<p id="p-13-98" class="">Je pouvais relier le passé et le présent.</p>
+<p id="p-13-99" class="">Parler de l&#x27;adolescente de The Voice Kids puis de la jeune femme devant des dizaines de milliers de personnes.</p>
+<p id="p-13-100" class="">Montrer une ancienne chanson puis la retrouver quelques années plus tard certifiée.</p>
+<p id="p-13-101" class="">Raconter la candidate avant de montrer l&#x27;artiste.</p>
+<p id="p-13-102" class="">C&#x27;est probablement pour ça que j&#x27;ai fini par vouloir écrire ce livre.</p>
+<p id="p-13-103" class="">À force de raconter Marine en vidéos de trente secondes, une minute, cinq minutes ou dix-huit minutes, j&#x27;avais envie d&#x27;un format qui ne soit pas pressé.</p>
+<p id="p-13-104" class="">Un livre ne vous demande pas de placer l&#x27;information importante avant les trois premières secondes pour empêcher le lecteur de « swiper ».</p>
+<p id="p-13-105" class="">Enfin, normalement.</p>
+<p id="p-13-106" class="">Dans un livre, on peut prendre le temps.</p>
+<p id="p-13-107" class="">On peut raconter le silence avant une chanson.</p>
+<p id="p-13-108" class="">On peut revenir en 2001.</p>
+<p id="p-13-109" class="">On peut parler de Grégory, de Jenifer, du retour de l&#x27;émission, puis attendre plusieurs chapitres avant que Marine entre vraiment dans l&#x27;histoire.</p>
+<p id="p-13-110" class="">On peut montrer que mon admiration n&#x27;est pas apparue dans le vide.</p>
+<p id="p-13-111" class="">Elle s&#x27;inscrit dans vingt-cinq ans de télévision, de musique et de souvenirs.</p>
+<p id="p-13-112" class="">C&#x27;est ce qui la rend, pour moi, différente.</p>
+<p id="p-13-113" class="">Marine n&#x27;est pas « la première chanteuse que j&#x27;ai aimée ».</p>
+<p id="p-13-114" class="">Ce serait absurde.</p>
+<p id="p-13-115" class="">Elle est la première depuis très longtemps à avoir transformé mon regard de spectateur en désir de créer autour d&#x27;une artiste de cette manière-là.</p>
+<p id="p-13-116" class="">Ce n&#x27;est pas la même chose.</p>
+<p id="p-13-117" class="">Et cette nuance explique presque tout.</p>
+<p id="p-13-118" class="">Je me suis parfois demandé combien de temps cela durerait.</p>
+<p id="p-13-119" class="">Une saison ?</p>
+<p id="p-13-120" class="">La tournée ?</p>
+<p id="p-13-121" class="">Le premier album ?</p>
+<p id="p-13-122" class="">Puis 2026 est arrivé.</p>
+<p id="p-13-123" class="">Je continuais d&#x27;écouter.</p>
+<p id="p-13-124" class="">Je continuais de suivre.</p>
+<p id="p-13-125" class="">Je continuais de créer.</p>
+<p id="p-13-126" class="">Alors j&#x27;ai arrêté de me poser la question.</p>
+<p id="p-13-127" class="">Une passion n&#x27;a pas besoin de signer un contrat de durée.</p>
+<p id="p-13-128" class="">Elle dure tant qu&#x27;elle dure.</p>
+<p id="p-13-129" class="">Et lorsqu&#x27;elle laisse quelque chose derrière elle, même si elle change un jour de forme, elle n&#x27;a pas été inutile.</p>
+<p id="p-13-130" class="">Aujourd&#x27;hui, le souvenir le plus précieux n&#x27;est même pas un chiffre de vues, un classement ou une certification.</p>
+<p id="p-13-131" class="">C&#x27;est le chemin.</p>
+<p id="p-13-132" class="">Le fait d&#x27;avoir vu « Ma faute » passer d&#x27;une chanson ancienne que les nouveaux fans découvraient à un titre massivement écouté.</p>
+<p id="p-13-133" class="">Le fait d&#x27;avoir vu Marine passer du château à Bollaert, puis du collectif Star Academy à sa propre tournée.</p>
+<p id="p-13-134" class="">Le fait d&#x27;avoir été à Montpellier et de constater physiquement que toutes ces personnes que je voyais commenter sous mes vidéos existaient quelque part dans une salle, autour de moi.</p>
+<p id="p-13-135" class="">Internet donne parfois l&#x27;impression que le public est une abstraction.</p>
+<p id="p-13-136" class="">Un nombre.</p>
+<p id="p-13-137" class="">Une courbe.</p>
+<p id="p-13-138" class="">Un pourcentage de rétention.</p>
+<p id="p-13-139" class="">Dans une salle, le public respire.</p>
+<p id="p-13-140" class="">Il chante faux parfois.</p>
+<p id="p-13-141" class="">Il crie trop fort.</p>
+<p id="p-13-142" class="">Il lève son téléphone exactement au moment où vous auriez aimé voir la scène.</p>
+<p id="p-13-143" class="">Il rit.</p>
+<p id="p-13-144" class="">Il se tait.</p>
+<p id="p-13-145" class="">Il applaudit.</p>
+<p id="p-13-146" class="">Et soudain, toutes les statistiques reprennent une forme humaine.</p>
+<p id="p-13-147" class="">C&#x27;est peut-être ce que j&#x27;ai préféré dans le passage de l&#x27;écran à la scène.</p>
+<p id="p-13-148" class="">Pas seulement voir Marine.</p>
+<p id="p-13-149" class="">Voir les fans.</p>
+<p id="p-13-150" class="">Comprendre que cette aventure que je vivais chez moi, avec mes vidéos et mon écran, était partagée par des gens de tous âges et de tous horizons.</p>
+<p id="p-13-151" class="">Nous n&#x27;avions pas tous la même raison d&#x27;être là.</p>
+<p id="p-13-152" class="">Certains avaient découvert Marine à la première seconde de la Star Academy.</p>
+<p id="p-13-153" class="">D&#x27;autres avec « Ma faute ».</p>
+<p id="p-13-154" class="">D&#x27;autres avec « Cœur maladroit » à la radio.</p>
+<p id="p-13-155" class="">Certains étaient venus avec leurs enfants.</p>
+<p id="p-13-156" class="">D&#x27;autres entre amis.</p>
+<p id="p-13-157" class="">Moi, j&#x27;étais Le Grognard du Net, quarante-cinq ans, un téléphone prêt à filmer deux ou trois séquences, et le sourire d&#x27;un type qui avait fini par admettre l&#x27;évidence.</p>
+<p id="p-13-158" class="">Oui, j&#x27;étais fan.</p>
+<p id="p-13-159" class="">Et non, ce n&#x27;était pas un problème.</p>
+<p id="p-13-160" class="">C&#x27;était même plutôt une chance.</p>
+</section>
+<section class="chapter" id="sec-14" data-section="14">
+<div class="chapter-head">
+<div class="chapter-kicker">ÉPILOGUE</div>
+<h1>À MARINE</h1></div>
+<p id="p-14-0" class="first-para">Tu ne me connais probablement pas.</p>
+<p id="p-14-1" class="">Ou peut-être as-tu déjà croisé le nom Le Grognard du Net au détour d&#x27;une vidéo, d&#x27;un titre, d&#x27;un commentaire ou d&#x27;une de ces créations que je publie depuis que ta voix a décidé de compliquer mon statut de simple téléspectateur.</p>
+<p id="p-14-2" class="">Ce n&#x27;est pas très important.</p>
+<p id="p-14-3" class="">Je n&#x27;ai pas écrit ce livre pour entrer dans ta vie.</p>
+<p id="p-14-4" class="">Je l&#x27;ai écrit pour raconter la place que ta musique a prise dans la mienne.</p>
+<p id="p-14-5" class="">J&#x27;avais vingt ans quand la Star Academy a commencé.</p>
+<p id="p-14-6" class="">J&#x27;en ai quarante-cinq aujourd&#x27;hui.</p>
+<p id="p-14-7" class="">Entre les deux, j&#x27;ai vu passer des dizaines de candidats, des gagnants, des voix extraordinaires, des carrières immenses et d&#x27;autres plus discrètes.</p>
+<p id="p-14-8" class="">J&#x27;ai aimé Jenifer.</p>
+<p id="p-14-9" class="">J&#x27;ai été profondément marqué par Grégory Lemarchal.</p>
+<p id="p-14-10" class="">J&#x27;ai suivi le retour de l&#x27;émission, Anisha, Pierre Garnier, Helena et beaucoup d&#x27;autres.</p>
+<p id="p-14-11" class="">Puis tu es arrivée.</p>
+<p id="p-14-12" class="">Je ne sais pas exactement quand je suis devenu fan.</p>
+<p id="p-14-13" class="">Peut-être qu&#x27;il n&#x27;y a pas eu un moment.</p>
+<p id="p-14-14" class="">Peut-être que c&#x27;était une addition de petites choses.</p>
+<p id="p-14-15" class="">Une première chanson.</p>
+<p id="p-14-16" class="">Un doute.</p>
+<p id="p-14-17" class="">Une grande note.</p>
+<p id="p-14-18" class="">Une blague.</p>
+<p id="p-14-19" class="">« Ma faute ».</p>
+<p id="p-14-20" class="">Une finale.</p>
+<p id="p-14-21" class="">« Maman, j&#x27;ai gagné. »</p>
+<p id="p-14-22" class="">Puis la suite.</p>
+<p id="p-14-23" class="">J&#x27;ai fait des vidéos.</p>
+<p id="p-14-24" class="">Beaucoup.</p>
+<p id="p-14-25" class="">J&#x27;ai raconté ton parcours à ma manière. J&#x27;ai parfois défendu ce que j&#x27;aimais chez toi. J&#x27;ai parfois simplement ri d&#x27;un moment drôle. J&#x27;ai créé des chansons inspirées par ce que ton aventure réveillait chez moi, avec une règle à laquelle je tiens : ne jamais te copier, ne jamais faire croire que ta voix était la mienne ou que la mienne était la tienne.</p>
+<p id="p-14-26" class="">Puis je t&#x27;ai vue sur scène à Montpellier.</p>
+<p id="p-14-27" class="">Et l&#x27;écran est devenu une salle.</p>
+<p id="p-14-28" class="">Je ne sais pas ce que ta carrière sera dans cinq ans, dix ans ou vingt ans.</p>
+<p id="p-14-29" class="">Je ne sais pas quelles chansons tu chanteras encore, ni lesquelles tu auras remplacées par d&#x27;autres.</p>
+<p id="p-14-30" class="">Mais je sais une chose.</p>
+<p id="p-14-31" class="">Pendant une période de ma vie où je pensais qu&#x27;une émission de télévision ne pouvait plus vraiment me surprendre, tu l&#x27;as fait.</p>
+<p id="p-14-32" class="">Tu m&#x27;as rappelé qu&#x27;on peut avoir quarante-cinq ans et attendre une chanson avec impatience.</p>
+<p id="p-14-33" class="">Qu&#x27;on peut créer simplement parce qu&#x27;on a envie de transmettre une émotion.</p>
+<p id="p-14-34" class="">Qu&#x27;on peut être fan sans perdre son recul.</p>
+<p id="p-14-35" class="">Et qu&#x27;un Grognard peut, de temps en temps, arrêter de grogner pour écouter.</p>
+<p id="p-14-36" class="">Alors merci.</p>
+<p id="p-14-37" class="">Pas pour être parfaite.</p>
+<p id="p-14-38" class="">Surtout pas.</p>
+<p id="p-14-39" class="">Merci pour les maladresses, les doutes, les rires, les chansons et tout ce qui reste encore à écrire.</p>
+<p id="p-14-40" class="">Je ne sais pas jusqu&#x27;où ira ton histoire.</p>
+<p id="p-14-41" class="">Je sais simplement à quel moment elle est entrée dans la mienne.</p>
+<p id="p-14-42" class="">Et puis Marine a chanté.</p>
+<p id="p-14-43" class="">Le reste, finalement, est venu tout seul.</p>
+<p id="p-14-44" class="">FIN</p>
+<p id="p-14-45" class="">REPÈRES DOCUMENTAIRES</p>
+<p id="p-14-46" class="">Les faits publics du récit ont été vérifiés à partir de sources accessibles au public. Cette page est destinée à la révision éditoriale et pourra être adaptée ou retirée dans l’édition finale.</p>
+<p id="p-14-47" class="">• TF1 Info, « Marine remporte la finale de la Star Academy, l’histoire d’une formidable revanche », 26 janvier 2025.</p>
+<p id="p-14-48" class="">• TF1 Info, entretien avec Marine au lendemain de sa victoire, 26 janvier 2025.</p>
+<p id="p-14-49" class="">• TF1 Info, « Je n’aimerais pas trop revenir à il y a un an : Marine raconte son rêve éveillé dans Sept à Huit », 24 août 2025.</p>
+<p id="p-14-50" class="">• TF1 Info, dossiers Star Academy 2022, 2023 et 2024 ; historique des gagnants.</p>
+<p id="p-14-51" class="">• Groupe TF1, historique du lancement de Star Academy en 2001.</p>
+<p id="p-14-52" class="">• Sony Music Entertainment France, « Au Nord c’était les Corons », 28 février 2025.</p>
+<p id="p-14-53" class="">• SNEP, certifications : « Ma faute » (diamant, décembre 2025), « Cœur maladroit » (single or, octobre 2025) et album « Cœur maladroit » (platine, janvier 2026).</p>
+<p id="p-14-54" class="">• Qobuz / Columbia – Sony Music Entertainment France, crédits et date de sortie de l’album « Cœur maladroit » (27 juin 2025).</p>
+<p id="p-14-55" class="">• Qobuz / Columbia – Sony Music Entertainment France, « Tricheur », paru le 4 septembre 2026.</p>
+<p id="p-14-56" class="">• Montpellier Events / Le Corum, fiche du concert de Marine à Montpellier du 7 décembre 2025.</p>
+<p id="p-14-57" class="">• L’Équipe et RC Lens, prestation de Marine sur « Les Corons » au stade Bollaert-Delelis, 16 février 2025.</p>
+<p id="p-14-58" class="">État des informations : 1er octobre 2026.</p>
+</section>
+          </div>
+        </div>
+      </article>
+    </div>
+    <nav class="nav" aria-label="Navigation des pages">
+      <button id="prevBtn">← Précédent</button>
+      <div class="counter" id="pageCounter">Couverture</div>
+      <button class="next" id="nextBtn">Suivant →</button>
+    </nav>
+    <div class="progress-wrap">
+      <div class="progress"><span id="progressBar"></span></div>
+      <div class="progress-label"><span id="chapterLabel">Couverture</span><span id="percentLabel">0 %</span></div>
+    </div>
+  </main>
+</div>
+
+<button class="fs-exit" id="fsExit" aria-label="Quitter le plein écran">✕</button>
+<div class="drawer-backdrop" id="backdrop"></div>
+
+<aside class="drawer" id="chaptersDrawer">
+  <div class="drawer-head"><h2>Chapitres</h2><button class="close-btn" data-close>×</button></div>
+  <div class="drawer-body">
+    <div class="badge">Récit complet</div>
+    <div style="height:10px"></div>
+    <div class="chapter-list" id="chapterList"></div>
+  </div>
+</aside>
+
+<aside class="drawer" id="settingsDrawer">
+  <div class="drawer-head"><h2>Confort de lecture</h2><button class="close-btn" data-close>×</button></div>
+  <div class="drawer-body">
+    <div class="setting"><label>Fond</label><div class="theme-choice">
+      <button type="button" data-theme="white">Blanc</button>
+      <button type="button" data-theme="ivory">Ivoire</button>
+    </div></div>
+    <div class="setting"><label for="fontSize">Taille du texte</label><div class="range-row"><span>A</span><input id="fontSize" type="range" min="16" max="25" value="19"><span>A+</span></div></div>
+    <div class="setting"><label for="lineHeight">Interligne</label><input id="lineHeight" type="range" min="1.45" max="2.05" step=".05" value="1.72" style="width:100%"></div>
+    <button id="resetReading" style="width:100%;padding:11px;border-radius:10px;border:1px solid var(--border);background:var(--panel)">Revenir à la couverture</button>
+  </div>
+</aside>
+
+<aside class="drawer" id="audioDrawer">
+  <div class="drawer-head"><h2>Lecture audio</h2><button class="close-btn" data-close>×</button></div>
+  <div class="drawer-body">
+    <p class="audio-status" id="audioStatus">Lecture vocale en français à partir de la page affichée.</p>
+    <div class="setting"><label for="voiceSelect">Voix</label><select id="voiceSelect" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:10px;background:var(--paper)"></select></div>
+    <div class="setting"><label for="speechRate">Vitesse</label><input id="speechRate" type="range" min=".75" max="1.25" step=".05" value=".95" style="width:100%"></div>
+    <div class="audio-actions">
+      <button id="audioPlay">▶ Lire la page</button>
+      <button id="audioPause">⏸ Pause / Reprendre</button>
+      <button id="audioStop">■ Arrêter</button>
+    </div>
+  </div>
+</aside>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(() => {
+  const CHAPTERS=[{"id": "sec-0", "heading": "NOTE AU LECTEUR"}, {"id": "sec-1", "heading": "PROLOGUE — JE N'AVAIS PAS PRÉVU DE DEVENIR FAN"}, {"id": "sec-2", "heading": "CHAPITRE 1 — AVANT MARINE, IL Y AVAIT DÉJÀ LE CHÂTEAU"}, {"id": "sec-3", "heading": "CHAPITRE 2 — GRÉGORY, LE PREMIER CHOC"}, {"id": "sec-4", "heading": "CHAPITRE 3 — LE RETOUR DU CHÂTEAU, SANS LE COUP DE FOUDRE"}, {"id": "sec-5", "heading": "CHAPITRE 4 — UNE VOIX « ORDINAIRE » QUI NE L'ÉTAIT PAS"}, {"id": "sec-6", "heading": "CHAPITRE 5 — AVANT LE CHÂTEAU, UNE FILLE DU NORD QUI N'A PAS ARRÊTÉ D'ESSAYER"}, {"id": "sec-7", "heading": "CHAPITRE 6 — LE CHÂTEAU, LES DOUTES ET LE KLAXON DU TGV"}, {"id": "sec-8", "heading": "CHAPITRE 7 — QUAND LE SPECTATEUR DEVIENT FAN"}, {"id": "sec-9", "heading": "CHAPITRE 8 — LE GROGNARD SE MET À RACONTER MARINE"}, {"id": "sec-10", "heading": "CHAPITRE 9 — « MAMAN, J'AI GAGNÉ »"}, {"id": "sec-11", "heading": "CHAPITRE 10 — APRÈS LA FINALE, TOUT COMMENCE"}, {"id": "sec-12", "heading": "CHAPITRE 11 — MONTPELLIER : DE L'ÉCRAN À LA SCÈNE"}, {"id": "sec-13", "heading": "CHAPITRE 12 — MARINE APRÈS MARINE"}, {"id": "sec-14", "heading": "ÉPILOGUE — À MARINE"}];
+  const $=id=>document.getElementById(id);
+  const cover=$('coverPage'),reader=$('readerPage'),viewport=$('flowViewport'),flow=$('flowContent');
+  const prevBtn=$('prevBtn'),nextBtn=$('nextBtn'),counter=$('pageCounter'),progress=$('progressBar'),percent=$('percentLabel'),chapterLabel=$('chapterLabel');
+  const STORAGE={page:'marine.reader.page',theme:'marine.reader.theme',size:'marine.reader.size',line:'marine.reader.line',voice:'marine.reader.voice',rate:'marine.reader.rate'};
+  let current=Number(localStorage.getItem(STORAGE.page)||0), textPages=1, totalPages=2, immersive=false, voices=[];
+  const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+  const showToast=t=>{const x=$('toast');x.textContent=t;x.classList.add('show');clearTimeout(x._t);x._t=setTimeout(()=>x.classList.remove('show'),1600)};
+  function closeDrawers(){document.querySelectorAll('.drawer').forEach(d=>d.classList.remove('open'));$('backdrop').classList.remove('open')}
+  function openDrawer(id){closeDrawers();$(id).classList.add('open');$('backdrop').classList.add('open')}
+  function computePages(preserve=true){
+    const ratio=textPages>1?clamp((current-1)/(textPages-1),0,1):0;
+    const w=viewport.clientWidth||1;
+    textPages=Math.max(1,Math.round(flow.scrollWidth/w));
+    totalPages=textPages+1;
+    if(current>0 && preserve) current=1+Math.round(ratio*Math.max(0,textPages-1));
+    current=clamp(current,0,textPages);
+    render(false);
+  }
+  function activeChapter(){
+    if(current===0)return -1;
+    const x=(current-1)*viewport.clientWidth+viewport.clientWidth*.35;
+    let found=0;
+    CHAPTERS.forEach((c,i)=>{const el=document.getElementById(c.id);if(el && el.offsetLeft<=x)found=i});
+    return found;
+  }
+  function render(save=true){
+    if(current===0){
+      cover.style.display='flex';reader.style.display='none';counter.textContent='Couverture';chapterLabel.textContent='Couverture';prevBtn.disabled=true;
+    }else{
+      cover.style.display='none';reader.style.display='block';
+      viewport.scrollLeft=(current-1)*viewport.clientWidth;
+      counter.textContent='Page '+current+' / '+textPages;
+      const ci=activeChapter();chapterLabel.textContent=ci>=0?CHAPTERS[ci].heading:'Lecture';
+      prevBtn.disabled=false;
+    }
+    nextBtn.disabled=current>=textPages;
+    const pct=textPages?Math.round(current/textPages*100):0;progress.style.width=pct+'%';percent.textContent=pct+' %';
+    document.querySelectorAll('.chapter-link').forEach((b,i)=>b.classList.toggle('active',i===activeChapter()));
+    if(save)localStorage.setItem(STORAGE.page,String(current));
+  }
+  function next(){if(current<textPages){current++;render()}}
+  function prev(){if(current>0){current--;render()}}
+  function jumpChapter(i){
+    const el=document.getElementById(CHAPTERS[i].id);if(!el)return;
+    current=1+Math.floor(el.offsetLeft/(viewport.clientWidth||1));render();closeDrawers();
+  }
+  function buildChapters(){
+    $('chapterList').innerHTML='';
+    CHAPTERS.forEach((c,i)=>{const b=document.createElement('button');b.className='chapter-link';b.textContent=c.heading;b.addEventListener('click',()=>jumpChapter(i));$('chapterList').appendChild(b)})
+  }
+  function setTheme(t){document.body.classList.remove('theme-white','theme-ivory');document.body.classList.add('theme-'+t);localStorage.setItem(STORAGE.theme,t);document.querySelectorAll('[data-theme]').forEach(b=>b.classList.toggle('selected',b.dataset.theme===t))}
+  function setSize(v){v=clamp(Number(v)||19,16,25);document.documentElement.style.setProperty('--reader-size',v+'px');$('fontSize').value=v;localStorage.setItem(STORAGE.size,v);requestAnimationFrame(()=>computePages(true))}
+  function setLine(v){v=clamp(Number(v)||1.72,1.45,2.05);document.documentElement.style.setProperty('--reader-line',v);$('lineHeight').value=v;localStorage.setItem(STORAGE.line,v);requestAnimationFrame(()=>computePages(true))}
+  function updateFullscreen(){
+    const active=!!document.fullscreenElement||immersive;
+    $('fullscreenBtn').textContent=active?'✕':'⛶';
+  }
+  async function toggleFullscreen(){
+    closeDrawers();
+    if(document.fullscreenElement){await document.exitFullscreen();return}
+    if(immersive){immersive=false;document.body.classList.remove('immersive');updateFullscreen();setTimeout(()=>computePages(true),250);return}
+    try{await document.documentElement.requestFullscreen({navigationUI:'hide'})}catch(e){immersive=true;document.body.classList.add('immersive');updateFullscreen();setTimeout(()=>computePages(true),250)}
+  }
+  function exitFullscreen(){
+    if(document.fullscreenElement)document.exitFullscreen();else{immersive=false;document.body.classList.remove('immersive');updateFullscreen();setTimeout(()=>computePages(true),250)}
+  }
+  function pageText(){
+    if(current===0)return '';
+    const vr=viewport.getBoundingClientRect();const parts=[];
+    flow.querySelectorAll('.chapter-head,p').forEach(el=>{
+      const r=el.getBoundingClientRect();
+      if(r.right>vr.left+8 && r.left<vr.right-8)parts.push(el.innerText.trim());
+    });
+    return parts.join(' ');
+  }
+  function loadVoices(){
+    voices=speechSynthesis.getVoices().filter(v=>v.lang && v.lang.toLowerCase().startsWith('fr'));
+    const sel=$('voiceSelect');sel.innerHTML='';
+    (voices.length?voices:speechSynthesis.getVoices()).forEach((v,i)=>{const o=document.createElement('option');o.value=String(i);o.textContent=v.name+' — '+v.lang;sel.appendChild(o)});
+    const saved=Number(localStorage.getItem(STORAGE.voice)||0);sel.selectedIndex=clamp(saved,0,Math.max(0,sel.options.length-1));
+  }
+  function speakPage(){
+    speechSynthesis.cancel();const txt=pageText();if(!txt){showToast('Passez à une page du récit');return}
+    const u=new SpeechSynthesisUtterance(txt);const all=(voices.length?voices:speechSynthesis.getVoices());
+    if(all.length)u.voice=all[clamp($('voiceSelect').selectedIndex,0,all.length-1)];
+    u.lang='fr-FR';u.rate=Number($('speechRate').value)||.95;
+    u.onstart=()=>$('audioStatus').textContent='Lecture en cours…';
+    u.onend=()=>$('audioStatus').textContent='Page terminée.';
+    speechSynthesis.speak(u);
+  }
+  buildChapters();
+  setTheme(localStorage.getItem(STORAGE.theme)||'ivory');
+  document.documentElement.style.setProperty('--reader-size',(localStorage.getItem(STORAGE.size)||19)+'px');
+  document.documentElement.style.setProperty('--reader-line',(localStorage.getItem(STORAGE.line)||1.72));
+  $('fontSize').value=localStorage.getItem(STORAGE.size)||19;$('lineHeight').value=localStorage.getItem(STORAGE.line)||1.72;
+  $('speechRate').value=localStorage.getItem(STORAGE.rate)||.95;
+  loadVoices();if('speechSynthesis'in window)speechSynthesis.onvoiceschanged=loadVoices;
+  requestAnimationFrame(()=>requestAnimationFrame(()=>computePages(false)));
+  prevBtn.addEventListener('click',prev);nextBtn.addEventListener('click',next);
+  $('chaptersBtn').addEventListener('click',()=>openDrawer('chaptersDrawer'));
+  $('settingsBtn').addEventListener('click',()=>openDrawer('settingsDrawer'));
+  $('audioBtn').addEventListener('click',()=>openDrawer('audioDrawer'));
+  $('fullscreenBtn').addEventListener('click',toggleFullscreen);$('fsExit').addEventListener('click',exitFullscreen);
+  $('backdrop').addEventListener('click',closeDrawers);document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',closeDrawers));
+  document.querySelectorAll('[data-theme]').forEach(b=>b.addEventListener('click',()=>setTheme(b.dataset.theme)));
+  $('fontSize').addEventListener('change',e=>setSize(e.target.value));$('lineHeight').addEventListener('change',e=>setLine(e.target.value));
+  $('resetReading').addEventListener('click',()=>{current=0;render();closeDrawers()});
+  $('voiceSelect').addEventListener('change',e=>localStorage.setItem(STORAGE.voice,String(e.target.selectedIndex)));
+  $('speechRate').addEventListener('input',e=>localStorage.setItem(STORAGE.rate,e.target.value));
+  $('audioPlay').addEventListener('click',speakPage);$('audioPause').addEventListener('click',()=>speechSynthesis.paused?speechSynthesis.resume():speechSynthesis.pause());$('audioStop').addEventListener('click',()=>{speechSynthesis.cancel();$('audioStatus').textContent='Lecture arrêtée.'});
+  document.addEventListener('fullscreenchange',()=>{immersive=false;document.body.classList.remove('immersive');updateFullscreen();setTimeout(()=>computePages(true),250)});
+  let sx=null,sy=null;reader.addEventListener('touchstart',e=>{if(e.touches.length===1){sx=e.touches[0].clientX;sy=e.touches[0].clientY}},{passive:true});
+  reader.addEventListener('touchend',e=>{if(sx===null||!e.changedTouches.length)return;const dx=e.changedTouches[0].clientX-sx,dy=e.changedTouches[0].clientY-sy;sx=sy=null;if(Math.abs(dx)>45&&Math.abs(dx)>Math.abs(dy)*1.2)dx<0?next():prev()},{passive:true});
+  reader.addEventListener('click',e=>{if(!matchMedia('(hover:hover) and (pointer:fine)').matches)return;if(e.target.closest('button,a,input,select,textarea'))return;const r=reader.getBoundingClientRect();e.clientX-r.left<r.width/2?prev():next()});
+  $('app').addEventListener('keydown',e=>{if(e.target.matches('input,select,textarea,button'))return;if(e.key==='ArrowRight'||e.key==='PageDown')next();if(e.key==='ArrowLeft'||e.key==='PageUp')prev()});
+  let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>computePages(true),250)},{passive:true});
+  if('serviceWorker'in navigator && location.protocol.startsWith('http'))navigator.serviceWorker.register('sw.js').catch(()=>{});
+})();
+</script>
+</body>
+</html>
