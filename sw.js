@@ -1,11 +1,11 @@
-const CACHE_NAME = 'le-scribe-v6-fast-start';
+const CACHE_NAME = 'le-scribe-v7-tome1-icon';
 const CORE = [
   './',
   './index.html',
   './manifest.webmanifest',
-  './icon.svg',
-  './icon-192.png',
-  './icon-512.png',
+  './images/icon-192.png',
+  './images/icon-512.png',
+  './images/icon-maskable-512.png',
   './images/Le Scribe et l’Ombre du Pharaon.png'
 ];
 
